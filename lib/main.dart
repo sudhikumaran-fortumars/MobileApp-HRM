@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(FortuMarsHRMApp());
@@ -14,7 +15,8 @@ class FortuMarsHRMApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         primaryColor: Color(0xFF1976D2),
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        fontFamily: 'SF Pro Display',
+        textTheme: GoogleFonts.outfitTextTheme(),
+        primaryTextTheme: GoogleFonts.outfitTextTheme(),
       ),
       home: SplashScreen(),
       debugShowCheckedModeBanner: false,
@@ -85,21 +87,35 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ],
                 ),
-                child: Icon(Icons.business, size: 60, color: Color(0xFF1976D2)),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    'assets/images/fortumars_logo.png',
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
               SizedBox(height: 30),
               Text(
                 'FortuMars',
-                style: TextStyle(
+                style: GoogleFonts.outfit(
                   color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 36,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
                 ),
               ),
               SizedBox(height: 10),
               Text(
                 'HRM Attendance Platform',
-                style: TextStyle(color: Colors.white70, fontSize: 16),
+                style: GoogleFonts.outfit(
+                  color: Colors.white70,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.5,
+                ),
               ),
               SizedBox(height: 50),
               CircularProgressIndicator(
@@ -164,30 +180,47 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: EdgeInsets.all(24.0),
           child: Form(
             key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                SizedBox(height: 40),
                 // Logo
                 Container(
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Color(0xFF1976D2),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  child: Icon(Icons.business, size: 50, color: Colors.white),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.asset(
+                      'assets/images/fortumars_logo.png',
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
                 SizedBox(height: 30),
                 Text(
-                  'Welcome Back',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                  'Sign In',
+                  style: GoogleFonts.outfit(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w700,
                     color: Color(0xFF333333),
+                    letterSpacing: 0.5,
                   ),
                 ),
                 SizedBox(height: 8),
@@ -296,6 +329,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
+                SizedBox(height: 40),
               ],
             ),
           ),
@@ -401,98 +435,133 @@ class LeaveRequest {
 
 // Mock Data
 class MockData {
-  static final List<Employee> employees = [
-    Employee(
-      empId: 'EMP001',
-      name: 'Abdul Rahman',
-      role: 'Frontend & Backend Developer',
-      department: 'Development',
-      shift: 'Morning',
-      status: 'Active',
-      hourlyRate: 200,
-      location: Location(lat: 11.1085, lng: 77.3411),
-    ),
-    Employee(
-      empId: 'EMP002',
-      name: 'Akash Kumar',
-      role: 'Frontend & Backend Developer',
-      department: 'Development',
-      shift: 'Morning',
-      status: 'Active',
-      hourlyRate: 180,
-      location: Location(lat: 11.1085, lng: 77.3411),
-    ),
-    Employee(
-      empId: 'EMP003',
-      name: 'BalaMurugan',
-      role: 'Frontend Developer',
-      department: 'Development',
-      shift: 'Evening',
-      status: 'Active',
-      hourlyRate: 150,
-      location: Location(lat: 11.1085, lng: 77.3411),
-    ),
-  ];
+  static List<Employee> get employees {
+    try {
+      return [
+        Employee(
+          empId: 'EMP001',
+          name: 'Sudhi Kumaran',
+          role: 'Frontend & Backend Developer',
+          department: 'Development',
+          shift: 'Morning',
+          status: 'Active',
+          hourlyRate: 200,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        ),
+        Employee(
+          empId: 'EMP002',
+          name: 'Akash Kumar',
+          role: 'Frontend & Backend Developer',
+          department: 'Development',
+          shift: 'Morning',
+          status: 'Active',
+          hourlyRate: 180,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        ),
+        Employee(
+          empId: 'EMP003',
+          name: 'BalaMurugan',
+          role: 'Frontend Developer',
+          department: 'Development',
+          shift: 'Evening',
+          status: 'Active',
+          hourlyRate: 150,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        ),
+      ];
+    } catch (e) {
+      return [
+        Employee(
+          empId: 'EMP001',
+          name: 'Sudhi Kumaran',
+          role: 'Frontend & Backend Developer',
+          department: 'Development',
+          shift: 'Morning',
+          status: 'Active',
+          hourlyRate: 200,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        ),
+      ];
+    }
+  }
 
-  static final Map<String, List<AttendanceRecord>> attendanceData = {
-    'EMP001': [
-      AttendanceRecord(
-        date: '2024-08-22',
-        checkIn: '09:00',
-        checkOut: '18:00',
-        status: 'Present',
-        hours: 8.0,
-        location: 'Office',
-        method: 'facial',
-      ),
-      AttendanceRecord(
-        date: '2024-08-21',
-        checkIn: '09:15',
-        checkOut: '18:30',
-        status: 'Present',
-        hours: 8.25,
-        location: 'Office',
-        method: 'geo',
-      ),
-    ],
-  };
+  static Map<String, List<AttendanceRecord>> get attendanceData {
+    try {
+      return {
+        'EMP001': [
+          AttendanceRecord(
+            date: '2024-08-22',
+            checkIn: '09:00',
+            checkOut: '18:00',
+            status: 'Present',
+            hours: 8.0,
+            location: 'Office',
+            method: 'facial',
+          ),
+          AttendanceRecord(
+            date: '2024-08-21',
+            checkIn: '09:15',
+            checkOut: '18:30',
+            status: 'Present',
+            hours: 8.25,
+            location: 'Office',
+            method: 'geo',
+          ),
+        ],
+      };
+    } catch (e) {
+      return {};
+    }
+  }
 
-  static final List<Task> tasks = [
-    Task(
-      id: 'TASK001',
-      title: 'Develop Login System',
-      assignedTo: 'EMP001',
-      assignedBy: 'ADMIN',
-      deadline: '2024-08-25',
-      status: 'In Progress',
-      priority: 'High',
-      estimatedHours: 8,
-      description: 'Implement JWT-based authentication system',
-    ),
-    Task(
-      id: 'TASK002',
-      title: 'Design Dashboard UI',
-      assignedTo: 'EMP003',
-      assignedBy: 'EMP001',
-      deadline: '2024-08-26',
-      status: 'Pending',
-      priority: 'Medium',
-      estimatedHours: 6,
-      description: 'Create responsive dashboard interface',
-    ),
-  ];
+  static List<Task> get tasks {
+    try {
+      return [
+        Task(
+          id: 'TASK001',
+          title: 'Develop Login System',
+          assignedTo: 'EMP001',
+          assignedBy: 'ADMIN',
+          deadline: '2024-08-25',
+          status: 'In Progress',
+          priority: 'High',
+          estimatedHours: 8,
+          description: 'Implement JWT-based authentication system',
+        ),
+        Task(
+          id: 'TASK002',
+          title: 'Design Dashboard UI',
+          assignedTo: 'EMP003',
+          assignedBy: 'EMP001',
+          deadline: '2024-08-26',
+          status: 'Pending',
+          priority: 'Medium',
+          estimatedHours: 6,
+          description: 'Create responsive dashboard interface',
+        ),
+      ];
+    } catch (e) {
+      return [];
+    }
+  }
 
-  static final List<LeaveRequest> leaveRequests = [
-    LeaveRequest(
-      id: 'LVE001',
-      empId: 'EMP002',
-      type: 'Sick Leave',
-      startDate: '2024-08-25',
-      endDate: '2024-08-26',
-      reason: 'Medical appointment',
-      status: 'Pending',
-    ),
-  ];
+  static List<LeaveRequest> get leaveRequests {
+    try {
+      return [
+        LeaveRequest(
+          id: 'LVE001',
+          empId: 'EMP002',
+          type: 'Sick Leave',
+          startDate: '2024-08-25',
+          endDate: '2024-08-26',
+          reason: 'Medical appointment',
+          status: 'Pending',
+        ),
+      ];
+    } catch (e) {
+      return [];
+    }
+  }
 }
 
 // Main Screen with Bottom Navigation
@@ -503,7 +572,51 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  final Employee currentUser = MockData.employees.first;
+  Employee? currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUser();
+  }
+
+  void _initializeUser() {
+    try {
+      if (MockData.employees.isNotEmpty) {
+        setState(() {
+          currentUser = MockData.employees.first;
+        });
+      } else {
+        // Fallback employee if list is empty
+        setState(() {
+          currentUser = Employee(
+            empId: 'EMP001',
+            name: 'Sudhi Kumaran',
+            role: 'Frontend & Backend Developer',
+            department: 'Development',
+            shift: 'Morning',
+            status: 'Active',
+            hourlyRate: 200,
+            location: Location(lat: 11.1085, lng: 77.3411),
+          );
+        });
+      }
+    } catch (e) {
+      // If there's any error, create a fallback employee
+      setState(() {
+        currentUser = Employee(
+          empId: 'EMP001',
+          name: 'Sudhi Kumaran',
+          role: 'Frontend & Backend Developer',
+          department: 'Development',
+          shift: 'Morning',
+          status: 'Active',
+          hourlyRate: 200,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        );
+      });
+    }
+  }
 
   final List<Widget> _screens = [
     DashboardScreen(),
@@ -515,6 +628,10 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (currentUser == null) {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: Container(
@@ -567,12 +684,44 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text('Dashboard'),
-        backgroundColor: Color(0xFF1976D2),
-        foregroundColor: Colors.white,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/fortumars_logo.png',
+              width: 90,
+              height: 90,
+              fit: BoxFit.contain,
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Dashboard',
+                  style: GoogleFonts.outfit(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 90,
+            ), // Add invisible space on right to balance the logo
+          ],
+        ),
+        centerTitle: true,
+        backgroundColor: Color(0xFFF5F5F5),
+        foregroundColor: Colors.black87,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
         actions: [
-          IconButton(icon: Icon(Icons.notifications), onPressed: () {}),
+          IconButton(
+            icon: Icon(Icons.notifications, color: Colors.black87),
+            onPressed: () {},
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -581,32 +730,50 @@ class DashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Welcome Card
-            Container(
+            AnimatedContainer(
+              duration: Duration(milliseconds: 300),
               width: double.infinity,
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.all(25),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF1976D2), Color(0xFF42A5F5)],
+                  colors: [
+                    Color(0xFF667eea),
+                    Color(0xFF764ba2),
+                    Color(0xFFf093fb),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFF667eea).withOpacity(0.4),
+                    blurRadius: 25,
+                    offset: Offset(0, 12),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Welcome Back!',
-                    style: TextStyle(
+                    style: GoogleFonts.outfit(
                       color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
                     ),
                   ),
                   SizedBox(height: 5),
                   Text(
-                    'Abdul Rahman',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                    'Sudhi Kumaran',
+                    style: GoogleFonts.outfit(
+                      color: Colors.white70,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                   SizedBox(height: 10),
                   Row(
@@ -673,10 +840,11 @@ class DashboardScreen extends StatelessWidget {
             // Quick Actions
             Text(
               'Quick Actions',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
                 color: Colors.black87,
+                letterSpacing: 0.3,
               ),
             ),
             SizedBox(height: 15),
@@ -782,16 +950,22 @@ class DashboardScreen extends StatelessWidget {
     IconData icon,
     Color color,
   ) {
-    return Container(
-      padding: EdgeInsets.all(15),
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      padding: EdgeInsets.all(25),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        gradient: LinearGradient(
+          colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: color.withOpacity(0.2), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
+            color: color.withOpacity(0.15),
+            blurRadius: 20,
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -824,29 +998,44 @@ class DashboardScreen extends StatelessWidget {
     Color color,
     VoidCallback onTap,
   ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 30),
-            SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-              textAlign: TextAlign.center,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          padding: EdgeInsets.all(25),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: color.withOpacity(0.3), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.2),
+                blurRadius: 15,
+                offset: Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: color, size: 30),
+              SizedBox(height: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -914,10 +1103,39 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text('Attendance'),
-        backgroundColor: Color(0xFF1976D2),
-        foregroundColor: Colors.white,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/fortumars_logo.png',
+              width: 90,
+              height: 90,
+              fit: BoxFit.contain,
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Attendance',
+                  style: GoogleFonts.outfit(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 90,
+            ), // Add invisible space on right to balance the logo
+          ],
+        ),
+        centerTitle: true,
+        backgroundColor: Color(0xFFF5F5F5),
+        foregroundColor: Colors.black87,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -925,17 +1143,25 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Current Status Card
-            Container(
+            AnimatedContainer(
+              duration: Duration(milliseconds: 500),
               width: double.infinity,
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.all(25),
               decoration: BoxDecoration(
-                color: isCheckedIn ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.circular(15),
+                gradient: LinearGradient(
+                  colors: isCheckedIn
+                      ? [Color(0xFF00b09b), Color(0xFF96c93d)]
+                      : [Color(0xFFff416c), Color(0xFFff4b2b)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(25),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                    offset: Offset(0, 2),
+                    color: (isCheckedIn ? Color(0xFF00b09b) : Color(0xFFff416c))
+                        .withOpacity(0.4),
+                    blurRadius: 25,
+                    offset: Offset(0, 12),
                   ),
                 ],
               ),
@@ -949,10 +1175,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   SizedBox(height: 10),
                   Text(
                     isCheckedIn ? 'Checked In' : 'Not Checked In',
-                    style: TextStyle(
+                    style: GoogleFonts.outfit(
                       color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
                     ),
                   ),
                   if (checkInTime != null)
@@ -963,25 +1190,31 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: isCheckedIn
-                          ? _checkOut
-                          : _showAttendanceOptions,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: isCheckedIn
-                            ? Colors.red
-                            : Colors.green,
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      child: ElevatedButton(
+                        onPressed: isCheckedIn
+                            ? _checkOut
+                            : _showAttendanceOptions,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: isCheckedIn
+                              ? Colors.red
+                              : Colors.green,
+                          padding: EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          elevation: 8,
+                          shadowColor: (isCheckedIn ? Colors.red : Colors.green)
+                              .withOpacity(0.3),
                         ),
-                      ),
-                      child: Text(
-                        isCheckedIn ? 'Check Out' : 'Check In',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                        child: Text(
+                          isCheckedIn ? 'Check Out' : 'Check In',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -992,31 +1225,41 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             SizedBox(height: 20),
 
             // Today's Summary
-                          Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+            AnimatedContainer(
+              duration: Duration(milliseconds: 400),
+              width: double.infinity,
+              padding: EdgeInsets.all(25),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.white, Color(0xFFf8f9fa)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Today\'s Summary',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(
+                  color: Colors.grey.withOpacity(0.1),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Today\'s Summary',
+                    style: GoogleFonts.outfit(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                      letterSpacing: 0.3,
                     ),
+                  ),
                   SizedBox(height: 15),
                   Row(
                     children: [
@@ -1054,34 +1297,35 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             // Attendance History
             Text(
               'Attendance History',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
                 color: Colors.black87,
+                letterSpacing: 0.3,
               ),
             ),
             SizedBox(height: 15),
-                          Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildHistoryItem(
-                      'August 21, 2024',
-                      '09:15 - 18:30',
-                      '8.25 hrs',
-                      'Present',
-                      Colors.green,
-                    ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  _buildHistoryItem(
+                    'August 21, 2024',
+                    '09:15 - 18:30',
+                    '8.25 hrs',
+                    'Present',
+                    Colors.green,
+                  ),
                   Divider(height: 1),
                   _buildHistoryItem(
                     'August 20, 2024',
@@ -1413,21 +1657,21 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   color: Colors.black87,
                 ),
               ),
-                              Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    status,
-                    style: TextStyle(
-                      color: statusColor,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  status,
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
+              ),
             ],
           ),
         ],
@@ -1444,12 +1688,28 @@ class TaskScreen extends StatefulWidget {
 
 class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
   late TabController _tabController;
-  List<Task> tasks = List.from(MockData.tasks);
+  List<Task> tasks = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _initializeTasks();
+  }
+
+  void _initializeTasks() {
+    try {
+      if (MockData.tasks.isNotEmpty) {
+        setState(() {
+          tasks = List.from(MockData.tasks);
+        });
+      }
+    } catch (e) {
+      // If there's any error, use empty list
+      setState(() {
+        tasks = [];
+      });
+    }
   }
 
   @override
@@ -1457,15 +1717,44 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text('Task Management'),
-        backgroundColor: Color(0xFF1976D2),
-        foregroundColor: Colors.white,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/fortumars_logo.png',
+              width: 90,
+              height: 90,
+              fit: BoxFit.contain,
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Task Management',
+                  style: GoogleFonts.outfit(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 90,
+            ), // Add invisible space on right to balance the logo
+          ],
+        ),
+        centerTitle: true,
+        backgroundColor: Color(0xFFF5F5F5),
+        foregroundColor: Colors.black87,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
+          labelColor: Colors.black87,
+          unselectedLabelColor: Colors.black54,
+          indicatorColor: Colors.black87,
           tabs: [
             Tab(text: 'All'),
             Tab(text: 'Pending'),
@@ -1487,6 +1776,28 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
           ),
           _buildTaskList(tasks.where((t) => t.status == 'Completed').toList()),
         ],
+      ),
+      floatingActionButton: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        child: FloatingActionButton(
+          onPressed: _showCreateTaskDialog,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Icon(Icons.add, color: Colors.white, size: 28),
+          ),
+          elevation: 12,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+        ),
       ),
     );
   }
@@ -1521,16 +1832,22 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
     Color priorityColor = _getPriorityColor(task.priority);
     Color statusColor = _getStatusColor(task.status);
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 12),
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      margin: EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [Colors.white, Color(0xFFf8f9fa)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -1908,12 +2225,28 @@ class LeaveScreen extends StatefulWidget {
 class _LeaveScreenState extends State<LeaveScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
-  List<LeaveRequest> leaveRequests = List.from(MockData.leaveRequests);
+  List<LeaveRequest> leaveRequests = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _initializeLeaveRequests();
+  }
+
+  void _initializeLeaveRequests() {
+    try {
+      if (MockData.leaveRequests.isNotEmpty) {
+        setState(() {
+          leaveRequests = List.from(MockData.leaveRequests);
+        });
+      }
+    } catch (e) {
+      // If there's any error, use empty list
+      setState(() {
+        leaveRequests = [];
+      });
+    }
   }
 
   @override
@@ -1921,15 +2254,44 @@ class _LeaveScreenState extends State<LeaveScreen>
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text('Leave Management'),
-        backgroundColor: Color(0xFF1976D2),
-        foregroundColor: Colors.white,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/fortumars_logo.png',
+              width: 90,
+              height: 90,
+              fit: BoxFit.contain,
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Leave Management',
+                  style: GoogleFonts.outfit(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 90,
+            ), // Add invisible space on right to balance the logo
+          ],
+        ),
+        centerTitle: true,
+        backgroundColor: Color(0xFFF5F5F5),
+        foregroundColor: Colors.black87,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
+          labelColor: Colors.black87,
+          unselectedLabelColor: Colors.black54,
+          indicatorColor: Colors.black87,
           tabs: [
             Tab(text: 'Apply Leave'),
             Tab(text: 'My Requests'),
@@ -1954,31 +2316,38 @@ class _LeaveScreenState extends State<LeaveScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-                        Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+          AnimatedContainer(
+            duration: Duration(milliseconds: 400),
+            width: double.infinity,
+            padding: EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.white, Color(0xFFf8f9fa)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Apply for Leave',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Apply for Leave',
+                  style: GoogleFonts.outfit(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                    letterSpacing: 0.3,
+                  ),
+                ),
                 SizedBox(height: 20),
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
@@ -2307,7 +2676,37 @@ class _LeaveScreenState extends State<LeaveScreen>
 
 // Profile Screen
 class ProfileScreen extends StatelessWidget {
-  final Employee currentUser = MockData.employees.first;
+  Employee get currentUser {
+    try {
+      if (MockData.employees.isNotEmpty) {
+        return MockData.employees.first;
+      } else {
+        // Fallback employee if list is empty
+        return Employee(
+          empId: 'EMP001',
+          name: 'Sudhi Kumaran',
+          role: 'Frontend & Backend Developer',
+          department: 'Development',
+          shift: 'Morning',
+          status: 'Active',
+          hourlyRate: 200,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        );
+      }
+    } catch (e) {
+      // If there's any error, return a fallback employee
+      return Employee(
+        empId: 'EMP001',
+        name: 'Sudhi Kumaran',
+        role: 'Frontend & Backend Developer',
+        department: 'Development',
+        shift: 'Morning',
+        status: 'Active',
+        hourlyRate: 200,
+        location: Location(lat: 11.1085, lng: 77.3411),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
