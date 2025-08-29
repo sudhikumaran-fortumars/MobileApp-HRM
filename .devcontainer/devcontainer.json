@@ -1,6 +1,6 @@
 {
   "name": "Flutter in Codespaces",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+   "image": "mcr.microsoft.com/devcontainers/universal:latest",
 
   "features": {
     "ghcr.io/devcontainers/features/node:1": {}
