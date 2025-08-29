@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 
-void main() {
-  runApp(FortuMarsHRMApp());
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import '../services/firebase_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
 class FortuMarsHRMApp extends StatelessWidget {
@@ -1088,6 +1094,12 @@ class DashboardScreen extends StatelessWidget {
 
 // Attendance Screen with all features
 class AttendanceScreen extends StatefulWidget {
+  final HttpsCallable _verifyQRCode =
+      FirebaseFunctions.instance.httpsCallable('verifyQRCode');
+  final HttpsCallable _verifyLocation =
+      FirebaseFunctions.instance.httpsCallable('verifyLocation');
+  final HttpsCallable _markAttendance =
+      FirebaseFunctions.instance.httpsCallable('markAttendance');
   @override
   State<AttendanceScreen> createState() => _AttendanceScreenState();
 }
@@ -1499,61 +1511,62 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   void _showQRScanner() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('QR Code Scanner'),
-        content: Container(
-          height: 200,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.qr_code_scanner, size: 80, color: Colors.green),
-              SizedBox(height: 20),
-              Text('Scanning for office QR code...'),
-              SizedBox(height: 20),
-              LinearProgressIndicator(),
-            ],
-          ),
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('QR Code Scanner'),
+      content: Container(
+        height: 200,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.qr_code_scanner, size: 80, color: Colors.green),
+            SizedBox(height: 20),
+            Text('Scanning for office QR code...'),
+            SizedBox(height: 20),
+            LinearProgressIndicator(),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _performCheckIn('QR Code');
-            },
-            child: Text('Scan Complete'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
-          ),
-        ],
       ),
-    );
-  }
-
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            // Example QR code value:
+            _performCheckIn("QR Code", qrData: "OFFICE123");
+          },
+          child: Text('Scan Complete'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('Cancel'),
+        ),
+      ],
+    ),
+  );
+}
+  
   void _checkInWithGeo() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Location Verification'),
-        content: Text('Checking your location...'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Simulate location check
-              Future.delayed(Duration(seconds: 1), () {
-                _performCheckIn('Geo Location');
-              });
-            },
-            child: Text('Verify'),
-          ),
-        ],
-      ),
-    );
-  }
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Location Verification'),
+      content: Text('Checking your location...'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            // Example user location (replace with actual GPS later):
+            double userLat = 13.0827;
+            double userLng = 80.2707;
+            _performCheckIn("Geo Location", lat: userLat, lng: userLng);
+          },
+          child: Text('Verify'),
+        ),
+      ],
+    ),
+  );
+}
 
   void _checkInManual() {
     _performCheckIn('Manual Entry');
