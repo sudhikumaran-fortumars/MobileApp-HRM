@@ -45,3 +45,6 @@ app.*.map.json
 /android/app/release
 .devcontainer/flutter_linux_3.24.3-stable.tar.xz
 flutter/
+.devcontainer/flutter_linux_3.24.3-stable.tar.xz
+flutter/
+*.tar.xz
