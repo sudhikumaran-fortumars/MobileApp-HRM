@@ -30,4 +30,3 @@
 - **Splash Screen**: Large logo in center
 - **Login Screen**: Logo in blue container
 - **All Other Screens**: Logo in top app bar
-

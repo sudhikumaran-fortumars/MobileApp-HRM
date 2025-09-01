@@ -1,0 +1,21 @@
+{
+  "name": "Flutter in Codespaces",
+   "image": "mcr.microsoft.com/devcontainers/universal:latest",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup_flutter.sh",
+
+  "forwardPorts": [8080],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Dart-Code.flutter",
+        "Dart-Code.dart-code"
+      ]
+    }
+  }
+}

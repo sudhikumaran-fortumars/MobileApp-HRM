@@ -60,4 +60,3 @@ The app now automatically selects the appropriate logo based on:
 - **Login Screen**: Uses dark logo on blue container
 - **Profile Section**: Uses appropriate icons for each section
 - **Small Displays**: Automatically scales logos appropriately
-

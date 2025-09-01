@@ -32,4 +32,3 @@ assets/images/
 1. Add your `fortumars_logo_dark.png` file to `assets/images/` folder
 2. Restart the app to see all changes
 3. Your logos will now display perfectly on all screens!
-
