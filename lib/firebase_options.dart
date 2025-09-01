@@ -40,50 +40,50 @@ class DefaultFirebaseOptions {
     }
   }
 
-  // TODO: Replace with your actual Firebase configuration
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'your-web-api-key',
-    appId: 'your-web-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    authDomain: 'your-project-id.firebaseapp.com',
-    storageBucket: 'your-project-id.appspot.com',
-    measurementId: 'your-measurement-id',
+    apiKey: 'AIzaSyDCcuTsrEBmZNMwFLciZxbp5sbiJ1RWSvM',
+    appId: '1:933599410604:web:8498099df5984366936209',
+    messagingSenderId: '933599410604',
+    projectId: 'myproject-f9e45',
+    authDomain: 'myproject-f9e45.firebaseapp.com',
+    storageBucket: 'myproject-f9e45.firebasestorage.app',
   );
 
+  // Web Firebase configuration
+
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'your-android-api-key',
-    appId: 'your-android-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyD95UyPhJf4FpLbZL0kyisx5BnKj5zBPb8',
+    appId: '1:933599410604:android:05eeb09398420971936209',
+    messagingSenderId: '933599410604',
+    projectId: 'myproject-f9e45',
+    storageBucket: 'myproject-f9e45.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'your-ios-api-key',
-    appId: 'your-ios-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
-    iosClientId: 'your-ios-client-id',
-    iosBundleId: 'com.example.fortumarsHrmApp',
+    apiKey: 'AIzaSyAzTK2andyeo0wbwaEMb9z6qfqQ70iMQms',
+    appId: '1:933599410604:ios:afb84f521b0836b8936209',
+    messagingSenderId: '933599410604',
+    projectId: 'myproject-f9e45',
+    storageBucket: 'myproject-f9e45.firebasestorage.app',
+    iosBundleId: 'com.example.flutterApplication1',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'your-macos-api-key',
-    appId: 'your-macos-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
-    iosClientId: 'your-macos-client-id',
-    iosBundleId: 'com.example.fortumarsHrmApp',
+    apiKey: 'AIzaSyAzTK2andyeo0wbwaEMb9z6qfqQ70iMQms',
+    appId: '1:933599410604:ios:afb84f521b0836b8936209',
+    messagingSenderId: '933599410604',
+    projectId: 'myproject-f9e45',
+    storageBucket: 'myproject-f9e45.firebasestorage.app',
+    iosBundleId: 'com.example.flutterApplication1',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'your-windows-api-key',
-    appId: 'your-windows-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    storageBucket: 'your-project-id.appspot.com',
+    apiKey: 'AIzaSyDCcuTsrEBmZNMwFLciZxbp5sbiJ1RWSvM',
+    appId: '1:933599410604:web:03e831591a8da692936209',
+    messagingSenderId: '933599410604',
+    projectId: 'myproject-f9e45',
+    authDomain: 'myproject-f9e45.firebaseapp.com',
+    storageBucket: 'myproject-f9e45.firebasestorage.app',
   );
+
 }

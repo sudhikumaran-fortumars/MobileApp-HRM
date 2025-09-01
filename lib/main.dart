@@ -3,12 +3,32 @@ import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+// import 'services/firebase_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
+// import './utils/data_seeder.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('Firebase initialized successfully');
+  } catch (e) {
+    print('Firebase initialization failed: $e');
+    print('App will continue without Firebase functionality');
+  }
+
+  // Seed initial data for testing
+  // try {
+  //   await DataSeeder.seedAllData();
+  // } catch (e) {
+  //   print('Error seeding data: $e');
+  // }
 
   runApp(FortuMarsHRMApp());
 }
