@@ -4,9 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 // import 'services/firebase_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:geolocator/geolocator.dart';
+// import 'package:permission_handler/permission_handler.dart';
 // import './utils/data_seeder.dart';
 
 void main() async {
@@ -774,7 +774,7 @@ class DashboardScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(25),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xFF667eea).withOpacity(0.4),
+                    color: Color(0xFF667eea).withValues(alpha: 0.4),
                     blurRadius: 25,
                     offset: Offset(0, 12),
                   ),
@@ -982,15 +982,15 @@ class DashboardScreen extends StatelessWidget {
       padding: EdgeInsets.all(25),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
+          colors: [color.withValues(alpha: 0.1), color.withValues(alpha: 0.05)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: color.withOpacity(0.2), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.15),
+            color: color.withValues(alpha: 0.15),
             blurRadius: 20,
             offset: Offset(0, 8),
           ),
@@ -1034,15 +1034,18 @@ class DashboardScreen extends StatelessWidget {
           padding: EdgeInsets.all(25),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+              colors: [
+                color.withValues(alpha: 0.15),
+                color.withValues(alpha: 0.05),
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: color.withOpacity(0.3), width: 2),
+            border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 blurRadius: 15,
                 offset: Offset(0, 6),
               ),
@@ -1186,7 +1189,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 boxShadow: [
                   BoxShadow(
                     color: (isCheckedIn ? Color(0xFF00b09b) : Color(0xFFff416c))
-                        .withOpacity(0.4),
+                        .withValues(alpha: 0.4),
                     blurRadius: 25,
                     offset: Offset(0, 12),
                   ),
@@ -1234,7 +1237,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           ),
                           elevation: 8,
                           shadowColor: (isCheckedIn ? Colors.red : Colors.green)
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                         ),
                         child: Text(
                           isCheckedIn ? 'Check Out' : 'Check In',
@@ -1264,12 +1267,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 ),
                 borderRadius: BorderRadius.circular(25),
                 border: Border.all(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: Offset(0, 8),
                   ),
@@ -1495,7 +1498,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Facial Recognition'),
-        content: Container(
+        content: SizedBox(
           height: 200,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1530,7 +1533,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('QR Code Scanner'),
-        content: Container(
+        content: SizedBox(
           height: 200,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1809,6 +1812,10 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
         child: FloatingActionButton(
           onPressed: _showCreateTaskDialog,
           backgroundColor: Colors.transparent,
+          elevation: 12,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -1819,10 +1826,6 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
               borderRadius: BorderRadius.circular(25),
             ),
             child: Icon(Icons.add, color: Colors.white, size: 28),
-          ),
-          elevation: 12,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
           ),
         ),
       ),
@@ -1869,10 +1872,10 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: Offset(0, 8),
           ),
@@ -1981,13 +1984,10 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
     switch (action) {
       case 'edit':
         _showEditTaskDialog(task);
-        break;
       case 'delete':
         _showDeleteTaskDialog(task);
-        break;
       case 'status':
         _showStatusChangeDialog(task);
-        break;
     }
   }
 
@@ -2138,46 +2138,95 @@ class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Change Task Status'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: Text('Pending'),
-              value: 'Pending',
-              groupValue: newStatus,
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    newStatus = value;
-                  });
-                }
-              },
-            ),
-            RadioListTile<String>(
-              title: Text('In Progress'),
-              value: 'In Progress',
-              groupValue: newStatus,
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    newStatus = value;
-                  });
-                }
-              },
-            ),
-            RadioListTile<String>(
-              title: Text('Completed'),
-              value: 'Completed',
-              groupValue: newStatus,
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    newStatus = value;
-                  });
-                }
-              },
-            ),
-          ],
+        content: StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: newStatus == 'Pending'
+                            ? Color(0xFF1976D2)
+                            : Colors.grey,
+                        width: 2,
+                      ),
+                      color: newStatus == 'Pending'
+                          ? Color(0xFF1976D2)
+                          : Colors.transparent,
+                    ),
+                    child: newStatus == 'Pending'
+                        ? Icon(Icons.check, size: 16, color: Colors.white)
+                        : null,
+                  ),
+                  title: Text('Pending'),
+                  onTap: () {
+                    setDialogState(() {
+                      newStatus = 'Pending';
+                    });
+                  },
+                ),
+                ListTile(
+                  leading: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: newStatus == 'In Progress'
+                            ? Color(0xFF1976D2)
+                            : Colors.grey,
+                        width: 2,
+                      ),
+                      color: newStatus == 'In Progress'
+                          ? Color(0xFF1976D2)
+                          : Colors.transparent,
+                    ),
+                    child: newStatus == 'In Progress'
+                        ? Icon(Icons.check, size: 16, color: Colors.white)
+                        : null,
+                  ),
+                  title: Text('In Progress'),
+                  onTap: () {
+                    setDialogState(() {
+                      newStatus = 'In Progress';
+                    });
+                  },
+                ),
+                ListTile(
+                  leading: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: newStatus == 'Completed'
+                            ? Color(0xFF1976D2)
+                            : Colors.grey,
+                        width: 2,
+                      ),
+                      color: newStatus == 'Completed'
+                          ? Color(0xFF1976D2)
+                          : Colors.transparent,
+                    ),
+                    child: newStatus == 'Completed'
+                        ? Icon(Icons.check, size: 16, color: Colors.white)
+                        : null,
+                  ),
+                  title: Text('Completed'),
+                  onTap: () {
+                    setDialogState(() {
+                      newStatus = 'Completed';
+                    });
+                  },
+                ),
+              ],
+            );
+          },
         ),
         actions: [
           TextButton(
@@ -2354,10 +2403,13 @@ class _LeaveScreenState extends State<LeaveScreen>
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(25),
-              border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+              border: Border.all(
+                color: Colors.grey.withValues(alpha: 0.1),
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: Offset(0, 8),
                 ),
@@ -2514,7 +2566,7 @@ class _LeaveScreenState extends State<LeaveScreen>
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: Offset(0, 2),
                 ),
