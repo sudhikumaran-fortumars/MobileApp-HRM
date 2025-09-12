@@ -242,7 +242,7 @@ class FirebaseService {
           .get();
 
       return query.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         data['id'] = doc.id;
         return data;
       }).toList();
@@ -268,7 +268,7 @@ class FirebaseService {
           .get();
 
       if (query.docs.isNotEmpty) {
-        final data = query.docs.first.data() as Map<String, dynamic>;
+        final data = query.docs.first.data();
         data['id'] = query.docs.first.id;
         return data;
       }
@@ -322,7 +322,7 @@ class FirebaseService {
           .get();
 
       return query.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         data['id'] = doc.id;
         return data;
       }).toList();
