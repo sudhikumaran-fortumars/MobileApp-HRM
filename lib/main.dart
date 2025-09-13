@@ -1,16 +1,68 @@
 ﻿import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:camera/camera.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
-// import 'services/firebase_service.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:geolocator/geolocator.dart';
-// import 'package:permission_handler/permission_handler.dart';
-// import './utils/data_seeder.dart';
+import 'services/break_time_service.dart';
+import 'services/app_data_service.dart';
+import 'services/hybrid_data_service.dart';
+import 'services/enhanced_otp_auth_service.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:country_code_picker/country_code_picker.dart';
+import './utils/data_seeder.dart';
+
+Future<void> _loadStoredUserData() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final employeeJson = prefs.getString('current_employee');
+    
+    if (employeeJson != null) {
+      final employeeData = jsonDecode(employeeJson);
+      final employee = Employee(
+        empId: employeeData['empId'] ?? '',
+        name: employeeData['name'] ?? '',
+        email: employeeData['email'] ?? '',
+        phone: employeeData['phone'] ?? '',
+        role: employeeData['role'] ?? '',
+        department: employeeData['department'] ?? '',
+        shift: employeeData['shift'] ?? 'Morning',
+        status: employeeData['status'] ?? 'Active',
+        hourlyRate: (employeeData['hourlyRate'] ?? 0.0).toDouble(),
+        location: Location(
+          lat: employeeData['location']['lat'] ?? 0.0,
+          lng: employeeData['location']['lng'] ?? 0.0,
+        ),
+        joinDate: DateTime.parse(employeeData['joinDate'] ?? DateTime.now().toIso8601String()),
+        address: employeeData['address'] ?? '',
+        emergencyContact: employeeData['emergencyContact'] ?? '',
+        emergencyPhone: employeeData['emergencyPhone'] ?? '',
+        workStats: WorkStatistics(
+          totalDaysWorked: employeeData['workStats']['totalDaysWorked'] ?? 0,
+          totalHoursWorked: (employeeData['workStats']['totalHoursWorked'] ?? 0.0).toDouble(),
+          leaveDaysUsed: employeeData['workStats']['leaveDaysUsed'] ?? 0,
+          leaveDaysRemaining: employeeData['workStats']['leaveDaysRemaining'] ?? 20,
+          attendanceRate: (employeeData['workStats']['attendanceRate'] ?? 0.0).toDouble(),
+          averageDailyHours: (employeeData['workStats']['averageDailyHours'] ?? 0.0).toDouble(),
+          lateArrivals: employeeData['workStats']['lateArrivals'] ?? 0,
+          earlyDepartures: employeeData['workStats']['earlyDepartures'] ?? 0,
+          recentAttendance: [],
+        ),
+        profileImagePath: employeeData['profileImagePath'],
+        hasRegisteredFace: employeeData['hasRegisteredFace'] ?? false,
+      );
+      
+      GlobalState.currentEmployee = employee;
+      print('✅ Loaded stored user data: ${employee.name}');
+    }
+  } catch (e) {
+    print('❌ Error loading stored user data: $e');
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,12 +85,35 @@ void main() async {
     print('Notification service initialization failed: $e');
   }
 
-  // Seed initial data for testing
-  // try {
-  //   await DataSeeder.seedAllData();
-  // } catch (e) {
-  //   print('Error seeding data: $e');
-  // }
+  // Initialize break time service
+  try {
+    await BreakTimeService.initialize();
+  } catch (e) {
+    print('Break time service initialization failed: $e');
+  }
+
+  // Initialize hybrid data service
+  try {
+    await HybridDataService.initialize();
+    print('Hybrid data service initialized successfully');
+  } catch (e) {
+    print('Hybrid data service initialization failed: $e');
+  }
+
+  // Load stored user data
+  await _loadStoredUserData();
+
+  // Seed initial data for testing with timeout (optional)
+  try {
+    await DataSeeder.seedAllData().timeout(
+      Duration(seconds: 5),
+      onTimeout: () {
+        print('Data seeding timed out, continuing...');
+      },
+    );
+  } catch (e) {
+    print('Error seeding data: $e');
+  }
 
   runApp(FortuMarsHRMApp());
 }
@@ -172,7 +247,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-// Login Screen
+// Enhanced Login Screen with Country Code and Registration
 class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -180,30 +255,60 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _empIdController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _otpController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _departmentController = TextEditingController();
+  final _positionController = TextEditingController();
+  
   bool _isLoading = false;
-  bool _obscurePassword = true;
+  bool _isOTPSent = false;
+  bool _showRegistration = false;
+  bool _showPhoneLogin = true;
+  String _phoneNumber = '';
+  String _countryCode = '+91';
 
-  Future<void> _login() async {
+  Future<void> _sendOTP() async {
+    if (!mounted) return;
+    
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
-      // Simulate API call
-      await Future.delayed(Duration(seconds: 2));
+      try {
+        final phoneNumber = _phoneController.text;
+        final result = await EnhancedOTPAuthService.sendOTP(phoneNumber, _countryCode);
 
       if (mounted) {
-        if (_empIdController.text == 'EMP001' &&
-            _passwordController.text == 'password') {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => MainScreen()),
-          );
-        } else {
+          if (result['success'] == true) {
+            setState(() {
+              _isOTPSent = true;
+              _phoneNumber = result['phoneNumber'];
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('OTP sent to $_phoneNumber'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(result['message'] ?? 'Failed to send OTP'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Invalid credentials'),
+              content: Text('Error: $e'),
               backgroundColor: Colors.red,
             ),
           );
@@ -215,6 +320,214 @@ class _LoginScreenState extends State<LoginScreen> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> _verifyOTP([String? otpText]) async {
+    if (!mounted) return;
+    
+    final otp = otpText ?? (mounted ? _otpController.text : '');
+    if (otp.length == 6) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final result = await EnhancedOTPAuthService.verifyOTP(otp);
+        
+        if (mounted) {
+          if (result['success'] == true) {
+            if (result['isNewUser'] == true) {
+              // New user - show registration form
+              setState(() {
+                _showRegistration = true;
+              });
+            } else {
+              // Existing user - direct login
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => MainScreen()),
+          );
+            }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(result['message'] ?? 'Invalid OTP'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _registerUser() async {
+    if (!mounted) return;
+    
+    print('🚀 Starting user registration...');
+    
+    if (_formKey.currentState!.validate()) {
+      print('✅ Form validation passed');
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        print('📞 Calling EnhancedOTPAuthService.registerUser...');
+        final result = await EnhancedOTPAuthService.registerUser(
+          phoneNumber: _phoneNumber,
+          username: _usernameController.text,
+          password: _passwordController.text,
+          fullName: _fullNameController.text,
+          email: _emailController.text,
+          department: _departmentController.text,
+          position: _positionController.text,
+        );
+        
+        print('📋 Registration result: $result');
+        
+        if (mounted) {
+          if (result['success'] == true) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Registration successful!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => MainScreen()),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(result['message'] ?? 'Registration failed'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> _loginWithCredentials() async {
+    if (!mounted) return;
+    
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final username = _usernameController.text;
+        final password = _passwordController.text;
+        final result = await EnhancedOTPAuthService.loginWithCredentials(username, password);
+        
+        if (mounted) {
+          if (result['success'] == true) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => MainScreen()),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(result['message'] ?? 'Login failed'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
+  Future<void> _resendOTP() async {
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await EnhancedOTPAuthService.resendOTP();
+      
+      if (mounted) {
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('OTP resent successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Failed to resend OTP'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -248,17 +561,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15),
-                    child: Image.asset(
-                      'assets/images/fortumars_logo.png',
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.contain,
+                    child: Icon(
+                      Icons.business,
+                      size: 60,
+                      color: Color(0xFF1976D2),
                     ),
                   ),
                 ),
                 SizedBox(height: 30),
                 Text(
-                  'Sign In',
+                  _showRegistration 
+                    ? 'Complete Registration' 
+                    : _isOTPSent 
+                      ? 'Verify OTP' 
+                      : 'Sign In',
                   style: GoogleFonts.outfit(
                     fontSize: 32,
                     fontWeight: FontWeight.w700,
@@ -268,17 +584,179 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Sign in to your account',
+                  _showRegistration
+                    ? 'Please fill in your details to complete registration'
+                    : _isOTPSent 
+                      ? 'Enter the 6-digit code sent to $_phoneNumber'
+                      : 'Enter your phone number to receive OTP',
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
                 SizedBox(height: 40),
 
-                // Employee ID Field
+                if (!_isOTPSent && !_showRegistration) ...[
+                  // Login Options Tabs
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _showPhoneLogin = true;
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: _showPhoneLogin ? Colors.white : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: _showPhoneLogin ? [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ] : null,
+                              ),
+                              child: Text(
+                                'Phone Login',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: _showPhoneLogin ? Color(0xFF1976D2) : Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _showPhoneLogin = false;
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: !_showPhoneLogin ? Colors.white : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: !_showPhoneLogin ? [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ] : null,
+                              ),
+                              child: Text(
+                                'Username Login',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: !_showPhoneLogin ? Color(0xFF1976D2) : Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 30),
+
+                  if (_showPhoneLogin) ...[
+                    // Phone Number Field with Country Code
+                    Row(
+                      children: [
+                        // Country Code Picker
+                        Container(
+                          height: 56,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey[300]!),
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.grey[50],
+                          ),
+                          child: CountryCodePicker(
+                            onChanged: (CountryCode countryCode) {
+                              setState(() {
+                                _countryCode = countryCode.dialCode!;
+                              });
+                            },
+                            initialSelection: 'IN',
+                            favorite: ['+91', 'IN'],
+                            showCountryOnly: false,
+                            showOnlyCountryWhenClosed: false,
+                            alignLeft: false,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        // Phone Number Input
+                        Expanded(
+                          child: TextFormField(
+                            controller: _phoneController,
+                            keyboardType: TextInputType.phone,
+                            decoration: InputDecoration(
+                              labelText: 'Phone Number',
+                              hintText: '9876543210',
+                              prefixIcon: Icon(Icons.phone_outlined),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your phone number';
+                              }
+                              if (value.length < 10) {
+                                return 'Please enter a valid phone number';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+
+                    // Send OTP Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _sendOTP,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF1976D2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                                'Send OTP',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ] else ...[
+                    // Username/Password Login
                 TextFormField(
-                  controller: _empIdController,
+                      controller: _usernameController,
                   decoration: InputDecoration(
-                    labelText: 'Employee ID',
-                    prefixIcon: Icon(Icons.person_outline),
+                        labelText: 'Username',
+                        hintText: 'Enter your username',
+                        prefixIcon: Icon(Icons.account_circle_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -287,32 +765,158 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your Employee ID';
+                          return 'Please enter your username';
                     }
                     return null;
                   },
                 ),
                 SizedBox(height: 20),
 
-                // Password Field
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: _obscurePassword,
+                      obscureText: true,
                   decoration: InputDecoration(
                     labelText: 'Password',
+                        hintText: 'Enter your password',
                     prefixIcon: Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[50],
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        return null;
                       },
                     ),
+                    SizedBox(height: 30),
+
+                    // Login Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _loginWithCredentials,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF1976D2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                                'Login',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ] else if (_isOTPSent && !_showRegistration) ...[
+                  // OTP Input Field
+                  PinCodeTextField(
+                    appContext: context,
+                    length: 6,
+                    keyboardType: TextInputType.number,
+                    animationType: AnimationType.fade,
+                    pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.box,
+                      borderRadius: BorderRadius.circular(12),
+                      fieldHeight: 50,
+                      fieldWidth: 45,
+                      activeFillColor: Colors.grey[50],
+                      inactiveFillColor: Colors.grey[50],
+                      selectedFillColor: Colors.blue[50],
+                      activeColor: Color(0xFF1976D2),
+                      inactiveColor: Colors.grey[300],
+                      selectedColor: Color(0xFF1976D2),
+                    ),
+                    enableActiveFill: true,
+                    onCompleted: (value) {
+                      if (mounted) {
+                        _verifyOTP(value);
+                      }
+                    },
+                    onChanged: (value) {
+                      // Auto-verify when 6 digits are entered
+                      if (value.length == 6 && mounted) {
+                        _verifyOTP(value);
+                      }
+                    },
+                  ),
+                  SizedBox(height: 30),
+
+                  // Verify OTP Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _verifyOTP,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF1976D2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              'Verify OTP',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
+                  // Resend OTP Button
+                  TextButton(
+                    onPressed: _isLoading ? null : _resendOTP,
+                    child: Text(
+                      'Resend OTP',
+                      style: TextStyle(
+                        color: Color(0xFF1976D2),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
+                  // Back to Phone Number
+                  TextButton(
+                      onPressed: () {
+                        setState(() {
+                        _isOTPSent = false;
+                        _otpController.clear();
+                        });
+                      },
+                    child: Text(
+                      'Change Phone Number',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ] else if (_showRegistration) ...[
+                  // Registration Form
+                  TextFormField(
+                    controller: _fullNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Full Name',
+                      hintText: 'Enter your full name',
+                      prefixIcon: Icon(Icons.person_outline),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -321,19 +925,135 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                        return 'Please enter your full name';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20),
+
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      hintText: 'Enter your email',
+                      prefixIcon: Icon(Icons.email_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      if (!value.contains('@')) {
+                        return 'Please enter a valid email';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20),
+
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      hintText: 'Choose a username',
+                      prefixIcon: Icon(Icons.account_circle_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a username';
+                      }
+                      if (value.length < 3) {
+                        return 'Username must be at least 3 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20),
+
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Enter your password',
+                      prefixIcon: Icon(Icons.lock_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a password';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20),
+
+                  TextFormField(
+                    controller: _departmentController,
+                    decoration: InputDecoration(
+                      labelText: 'Department',
+                      hintText: 'Enter your department',
+                      prefixIcon: Icon(Icons.business_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your department';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20),
+
+                  TextFormField(
+                    controller: _positionController,
+                    decoration: InputDecoration(
+                      labelText: 'Position',
+                      hintText: 'Enter your position',
+                      prefixIcon: Icon(Icons.work_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your position';
                     }
                     return null;
                   },
                 ),
                 SizedBox(height: 30),
 
-                // Login Button
+                  // Register Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _login,
+                      onPressed: _isLoading ? null : _registerUser,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF1976D2),
                       shape: RoundedRectangleBorder(
@@ -343,10 +1063,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: _isLoading
                         ? CircularProgressIndicator(color: Colors.white)
                         : Text(
-                            'Sign In',
+                              'Complete Registration',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
                           ),
@@ -354,31 +1074,42 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 20),
 
-                // Demo Credentials
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Demo Credentials:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                  // Back to OTP
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _showRegistration = false;
+                        _isOTPSent = true;
+                      });
+                    },
+                    child: Text(
+                      'Back to OTP Verification',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
                       ),
-                      Text('Employee ID: EMP001'),
-                      Text('Password: password'),
-                    ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 40),
+                ],
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _otpController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _departmentController.dispose();
+    _positionController.dispose();
+    super.dispose();
   }
 }
 
@@ -535,6 +1266,7 @@ class LeaveRequest {
   final String endDate;
   final String reason;
   final String status;
+  final DateTime appliedDate;
 
   LeaveRequest({
     required this.id,
@@ -544,6 +1276,7 @@ class LeaveRequest {
     required this.endDate,
     required this.reason,
     required this.status,
+    required this.appliedDate,
   });
 }
 
@@ -561,17 +1294,39 @@ class GlobalState {
   static bool _isCheckedIn = false;
   static String? _checkInTime;
   static String? _checkInMethod;
+  static Employee? _currentEmployee;
   static Timer? _updateTimer;
   static List<VoidCallback> _listeners = [];
   
   static bool get isCheckedIn => _isCheckedIn;
   static String? get checkInTime => _checkInTime;
   static String? get checkInMethod => _checkInMethod;
+  static Employee? get currentEmployee => _currentEmployee;
   
   static void setCheckInStatus(bool isCheckedIn, String? checkInTime, String? method) {
     _isCheckedIn = isCheckedIn;
     _checkInTime = checkInTime;
     _checkInMethod = method;
+    _notifyListeners();
+  }
+  
+  static set isCheckedIn(bool value) {
+    _isCheckedIn = value;
+    _notifyListeners();
+  }
+  
+  static set checkInTime(String? value) {
+    _checkInTime = value;
+    _notifyListeners();
+  }
+  
+  static set checkInMethod(String? value) {
+    _checkInMethod = value;
+    _notifyListeners();
+  }
+  
+  static set currentEmployee(Employee? value) {
+    _currentEmployee = value;
     _notifyListeners();
   }
   
@@ -610,36 +1365,14 @@ class GlobalState {
 
 // Real-time data management system
 class EmployeeData {
-  static Employee _currentEmployee = Employee(
-    empId: 'EMP001',
-    name: 'Sudhi Kumaran',
-    email: 'sudhi.kumaran@fortumars.com',
-    phone: '+91 9876543210',
-    role: 'Frontend & Backend Developer',
-    department: 'Development',
-    shift: 'Morning',
-    status: 'Active',
-    hourlyRate: 200,
-    location: Location(lat: 11.1085, lng: 77.3411),
-    joinDate: DateTime(2023, 1, 15),
-    address: '123 Tech Street, Bangalore, Karnataka 560001',
-    emergencyContact: 'Priya Kumaran',
-    emergencyPhone: '+91 9876543211',
-    workStats: WorkStatistics(
-      totalDaysWorked: 245,
-      totalHoursWorked: 1960.0,
-      leaveDaysUsed: 8,
-      leaveDaysRemaining: 22,
-      attendanceRate: 95.5,
-      averageDailyHours: 8.0,
-      lateArrivals: 3,
-      earlyDepartures: 1,
-      recentAttendance: [],
-    ),
-    hasRegisteredFace: false,
-  );
+  static Employee? _currentEmployee;
 
-  static Employee get currentEmployee => _currentEmployee;
+  static Employee? get currentEmployee => _currentEmployee;
+
+  // Load employee from Firebase
+  static Future<void> loadFromFirebase() async {
+    _currentEmployee = await AppDataService.loadCurrentEmployee();
+  }
 
   static void updateEmployee(Employee updatedEmployee) {
     _currentEmployee = updatedEmployee;
@@ -647,7 +1380,8 @@ class EmployeeData {
   }
 
   static void registerFace(String faceData, String faceImagePath) {
-    _currentEmployee = _currentEmployee.copyWith(
+    if (_currentEmployee != null) {
+      _currentEmployee = _currentEmployee!.copyWith(
       hasRegisteredFace: true,
       faceData: faceData,
       faceImagePath: faceImagePath,
@@ -655,13 +1389,16 @@ class EmployeeData {
       faceRegistrationDate: DateTime.now(),
     );
     _saveToLocalStorage();
+    }
   }
 
   static void updateProfilePicture(String imagePath) {
-    _currentEmployee = _currentEmployee.copyWith(
+    if (_currentEmployee != null) {
+      _currentEmployee = _currentEmployee!.copyWith(
       profileImagePath: imagePath,
     );
     _saveToLocalStorage();
+    }
   }
 
   static void updatePersonalInfo({
@@ -672,7 +1409,8 @@ class EmployeeData {
     String? emergencyContact,
     String? emergencyPhone,
   }) {
-    _currentEmployee = _currentEmployee.copyWith(
+    if (_currentEmployee != null) {
+      _currentEmployee = _currentEmployee!.copyWith(
       name: name,
       email: email,
       phone: phone,
@@ -681,17 +1419,21 @@ class EmployeeData {
       emergencyPhone: emergencyPhone,
     );
     _saveToLocalStorage();
+    }
   }
 
   static void updateWorkStats(WorkStatistics newStats) {
-    _currentEmployee = _currentEmployee.copyWith(
+    if (_currentEmployee != null) {
+      _currentEmployee = _currentEmployee!.copyWith(
       workStats: newStats,
     );
     _saveToLocalStorage();
+    }
   }
 
   static void addAttendanceRecord(AttendanceRecord record) {
-    final currentStats = _currentEmployee.workStats;
+    if (_currentEmployee != null) {
+      final currentStats = _currentEmployee!.workStats;
     final updatedRecentAttendance = List<AttendanceRecord>.from(currentStats.recentAttendance)
       ..insert(0, record);
     
@@ -706,10 +1448,11 @@ class EmployeeData {
     // Calculate new statistics
     final newStats = _calculateWorkStatistics(updatedRecentAttendance);
     
-    _currentEmployee = _currentEmployee.copyWith(
+      _currentEmployee = _currentEmployee!.copyWith(
       workStats: newStats,
     );
     _saveToLocalStorage();
+    }
   }
 
   static void _applyAttendanceRules(List<AttendanceRecord> attendance) {
@@ -796,19 +1539,13 @@ class EmployeeData {
            (checkOut.hour == earlyThreshold.hour && checkOut.minute < earlyThreshold.minute);
   }
 
-  static String _getCheckInStatus(String checkInTime) {
+  static String getCheckInStatus(String checkInTime) {
     if (_isLateArrival(checkInTime)) {
       return 'Late';
     }
     return 'On Time';
   }
 
-  static String _getCheckOutStatus(String checkOutTime) {
-    if (_isEarlyDeparture(checkOutTime)) {
-      return 'Early';
-    }
-    return 'On Time';
-  }
 
   static void _saveToLocalStorage() {
     // In a real app, this would save to SharedPreferences or a database
@@ -991,6 +1728,7 @@ class MockData {
           endDate: '2024-08-26',
           reason: 'Medical appointment',
           status: 'Pending',
+          appliedDate: DateTime.now().subtract(Duration(days: 2)),
         ),
       ];
     } catch (e) {
@@ -1007,84 +1745,10 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  Employee? currentUser;
 
   @override
   void initState() {
     super.initState();
-    _initializeUser();
-  }
-
-  void _initializeUser() {
-    try {
-      if (MockData.employees.isNotEmpty) {
-        setState(() {
-          currentUser = MockData.employees.first;
-        });
-      } else {
-        // Fallback employee if list is empty
-        setState(() {
-          currentUser = Employee(
-            empId: 'EMP001',
-            name: 'Sudhi Kumaran',
-            email: 'sudhi.kumaran@fortumars.com',
-            phone: '+91 9876543210',
-            role: 'Frontend & Backend Developer',
-            department: 'Development',
-            shift: 'Morning',
-            status: 'Active',
-            hourlyRate: 200,
-            location: Location(lat: 11.1085, lng: 77.3411),
-            joinDate: DateTime(2023, 1, 15),
-            address: '123 Tech Street, Bangalore, Karnataka 560001',
-            emergencyContact: 'Priya Kumaran',
-            emergencyPhone: '+91 9876543211',
-            workStats: WorkStatistics(
-              totalDaysWorked: 245,
-              totalHoursWorked: 1960.0,
-              leaveDaysUsed: 8,
-              leaveDaysRemaining: 22,
-              attendanceRate: 95.5,
-              averageDailyHours: 8.0,
-              lateArrivals: 3,
-              earlyDepartures: 1,
-              recentAttendance: [],
-            ),
-          );
-        });
-      }
-    } catch (e) {
-      // If there's any error, create a fallback employee
-      setState(() {
-        currentUser = Employee(
-          empId: 'EMP001',
-          name: 'Sudhi Kumaran',
-          email: 'sudhi.kumaran@fortumars.com',
-          phone: '+91 9876543210',
-          role: 'Frontend & Backend Developer',
-          department: 'Development',
-          shift: 'Morning',
-          status: 'Active',
-          hourlyRate: 200,
-          location: Location(lat: 11.1085, lng: 77.3411),
-          joinDate: DateTime(2023, 1, 15),
-          address: '123 Tech Street, Bangalore, Karnataka 560001',
-          emergencyContact: 'Priya Kumaran',
-          emergencyPhone: '+91 9876543211',
-          workStats: WorkStatistics(
-            totalDaysWorked: 245,
-            totalHoursWorked: 1960.0,
-            leaveDaysUsed: 8,
-            leaveDaysRemaining: 22,
-            attendanceRate: 95.5,
-            averageDailyHours: 8.0,
-            lateArrivals: 3,
-            earlyDepartures: 1,
-            recentAttendance: [],
-          ),
-        );
-      });
-    }
   }
 
   final List<Widget> _screens = [
@@ -1096,10 +1760,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (currentUser == null) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
@@ -1154,7 +1814,7 @@ class _MainScreenState extends State<MainScreen> {
 // Real-time Clock Widget
 class LiveClock extends StatefulWidget {
   @override
-  _LiveClockState createState() => _LiveClockState();
+  State<LiveClock> createState() => _LiveClockState();
 }
 
 class _LiveClockState extends State<LiveClock> {
@@ -1246,7 +1906,7 @@ class _LiveClockState extends State<LiveClock> {
 // Dashboard Screen
 class DashboardScreen extends StatefulWidget {
   @override
-  _DashboardScreenState createState() => _DashboardScreenState();
+  State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
@@ -1293,11 +1953,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            Image.asset(
-              'assets/images/fortumars_logo.png',
-              width: 90,
-              height: 90,
-              fit: BoxFit.contain,
+            Icon(
+              Icons.business,
+              size: 40,
+              color: Color(0xFF1976D2),
             ),
             Expanded(
               child: Center(
@@ -1370,7 +2029,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 borderRadius: BorderRadius.circular(25),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xFF667eea).withValues(alpha: 0.4),
+                    color: Color(0xFF667eea).withValues(alpha:0.4),
                     blurRadius: 25,
                     offset: Offset(0, 12),
                   ),
@@ -1424,6 +2083,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
               SizedBox(height: 20),
             ],
 
+            // Break Time Card (if on break)
+            if (BreakTimeService.isOnBreak) 
+              Container(
+                margin: EdgeInsets.only(bottom: 20),
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.orange[100],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  'Break Time Active',
+                  style: GoogleFonts.outfit(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.orange[800],
+                  ),
+                ),
+              ),
+
+            // Break Time Action Button (if checked in and break time available)
+            if (GlobalState.isCheckedIn && !BreakTimeService.isOnBreak)
+              Container(
+                margin: EdgeInsets.only(bottom: 20),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Break time functionality
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange[600],
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text('Start Break'),
+                ),
+              ),
+
 
             // Check-in Status Card
             Container(
@@ -1438,7 +2132,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.blue.withValues(alpha: 0.3),
+                    color: Colors.blue.withValues(alpha:0.3),
                     blurRadius: 10,
                     offset: Offset(0, 5),
                   ),
@@ -1496,7 +2190,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(
                   child: _buildStatCard(
                     'Hours Today',
-                    '${_calculateTodayHours()}',
+                    _calculateTodayHours(),
                     Icons.timer,
                     Colors.green,
                   ),
@@ -1505,7 +2199,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(
                   child: _buildStatCard(
                     'Leave Balance',
-                    '${EmployeeData.currentEmployee.workStats.leaveDaysRemaining}',
+                    EmployeeData.currentEmployee?.workStats.leaveDaysRemaining.toString() ?? '0',
                     Icons.beach_access,
                     Colors.purple,
                   ),
@@ -1527,7 +2221,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Expanded(
                   child: _buildStatCard(
                     'Attendance Rate',
-                    '${EmployeeData.currentEmployee.workStats.attendanceRate.toStringAsFixed(1)}%',
+                    '${EmployeeData.currentEmployee?.workStats.attendanceRate.toStringAsFixed(1) ?? '0.0'}%',
                     Icons.trending_up,
                     Colors.green,
                   ),
@@ -1843,13 +2537,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   String _getCheckInStatusText() {
     if (GlobalState.checkInTime == null) return '';
-    final status = EmployeeData._getCheckInStatus(GlobalState.checkInTime!);
+    final status = EmployeeData.getCheckInStatus(GlobalState.checkInTime!);
     return status == 'Late' ? 'Late Arrival' : 'On Time';
   }
 
   Color _getCheckInStatusColor() {
     if (GlobalState.checkInTime == null) return Colors.white70;
-    final status = EmployeeData._getCheckInStatus(GlobalState.checkInTime!);
+    final status = EmployeeData.getCheckInStatus(GlobalState.checkInTime!);
     return status == 'Late' ? Colors.orange[300]! : Colors.green[300]!;
   }
 
@@ -1870,8 +2564,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final checkInHour = isPM && hour != 12 ? hour + 12 : (hour == 12 && !isPM ? 0 : hour);
     final checkInDateTime = DateTime(now.year, now.month, now.day, checkInHour, minute);
     
-    final hoursWorked = now.difference(checkInDateTime).inHours + 
-                       (now.difference(checkInDateTime).inMinutes % 60) / 60.0;
+    final totalMinutes = now.difference(checkInDateTime).inMinutes;
+    
+    // Subtract break time from total work time
+    final breakTimeMinutes = BreakTimeService.getTotalBreakTimeMinutes();
+    final actualWorkMinutes = totalMinutes - breakTimeMinutes;
+    
+    final hoursWorked = actualWorkMinutes / 60.0;
     
     return hoursWorked.toStringAsFixed(1);
   }
@@ -1880,7 +2579,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final currentMonth = DateTime.now().month;
     final currentYear = DateTime.now().year;
     
-    final monthlyRecords = EmployeeData.currentEmployee.workStats.recentAttendance
+    final monthlyRecords = EmployeeData.currentEmployee?.workStats.recentAttendance ?? []
         .where((record) {
           final recordDate = DateTime.parse(record.date);
           return recordDate.month == currentMonth && recordDate.year == currentYear;
@@ -1897,7 +2596,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   List<Widget> _buildRecentActivities() {
     final activities = <Widget>[];
-    final recentAttendance = EmployeeData.currentEmployee.workStats.recentAttendance;
+    final recentAttendance = EmployeeData.currentEmployee?.workStats.recentAttendance ?? [];
     
     // Show recent check-ins
     for (int i = 0; i < recentAttendance.length && i < 3; i++) {
@@ -2012,7 +2711,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
     final endOfWeek = startOfWeek.add(Duration(days: 6));
     
-    final weeklyRecords = EmployeeData.currentEmployee.workStats.recentAttendance
+    final weeklyRecords = EmployeeData.currentEmployee?.workStats.recentAttendance ?? []
         .where((record) {
           final recordDate = DateTime.parse(record.date);
           return recordDate.isAfter(startOfWeek.subtract(Duration(days: 1))) &&
@@ -2033,7 +2732,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
     final endOfWeek = startOfWeek.add(Duration(days: 6));
     
-    final weeklyRecords = EmployeeData.currentEmployee.workStats.recentAttendance
+    final weeklyRecords = EmployeeData.currentEmployee?.workStats.recentAttendance ?? []
         .where((record) {
           final recordDate = DateTime.parse(record.date);
           return recordDate.isAfter(startOfWeek.subtract(Duration(days: 1))) &&
@@ -2052,7 +2751,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final currentMonth = DateTime.now().month;
     final currentYear = DateTime.now().year;
     
-    final monthlyRecords = EmployeeData.currentEmployee.workStats.recentAttendance
+    final monthlyRecords = EmployeeData.currentEmployee?.workStats.recentAttendance ?? []
         .where((record) {
           final recordDate = DateTime.parse(record.date);
           return recordDate.month == currentMonth && recordDate.year == currentYear;
@@ -2073,7 +2772,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final currentMonth = DateTime.now().month;
     final currentYear = DateTime.now().year;
     
-    final monthlyRecords = EmployeeData.currentEmployee.workStats.recentAttendance
+    final monthlyRecords = EmployeeData.currentEmployee?.workStats.recentAttendance ?? []
         .where((record) {
           final recordDate = DateTime.parse(record.date);
           return recordDate.month == currentMonth && recordDate.year == currentYear;
@@ -2094,7 +2793,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   String _calculateCurrentStreak() {
-    final records = EmployeeData.currentEmployee.workStats.recentAttendance;
+    final records = EmployeeData.currentEmployee?.workStats.recentAttendance ?? [];
     if (records.isEmpty) return '0';
     
     int streak = 0;
@@ -2131,7 +2830,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.green.withValues(alpha: 0.3),
+            color: Colors.green.withValues(alpha:0.3),
             blurRadius: 15,
             offset: Offset(0, 8),
           ),
@@ -2209,10 +2908,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
 
-  // Removed advanced analytics section
-  Widget _buildAdvancedAnalyticsSection() {
-    return SizedBox.shrink(); // Empty widget
-  }
 
 }
 
@@ -2582,13 +3277,10 @@ class _LeaveScreenState extends State<LeaveScreen>
     switch (status.toLowerCase()) {
       case 'approved':
         color = Colors.green;
-        break;
       case 'pending':
         color = Colors.orange;
-        break;
       case 'rejected':
         color = Colors.red;
-        break;
       default:
         color = Colors.grey;
     }
@@ -2609,12 +3301,17 @@ class _LeaveScreenState extends State<LeaveScreen>
       ),
     );
   }
+
+
+
+
+
 }
 
 // Attendance Report Screen
 class AttendanceReportScreen extends StatefulWidget {
   @override
-  _AttendanceReportScreenState createState() => _AttendanceReportScreenState();
+  State<AttendanceReportScreen> createState() => _AttendanceReportScreenState();
 }
 
 class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
@@ -2630,7 +3327,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
 
   void _filterRecords() {
     final currentUser = EmployeeData.currentEmployee;
-    final allRecords = currentUser.workStats.recentAttendance;
+    final allRecords = currentUser?.workStats.recentAttendance ?? [];
     
     setState(() {
       _filteredRecords = allRecords.where((record) {
@@ -2662,7 +3359,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null && picked != _selectedDate && mounted) {
       setState(() {
         _selectedDate = picked;
         _filterRecords();
@@ -2672,7 +3369,6 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = EmployeeData.currentEmployee;
     final monthlyStats = _calculateMonthlyStats();
     
     return Scaffold(
@@ -2817,7 +3513,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
               ),
             ),
             SizedBox(height: 16),
-            ..._filteredRecords.map((record) => _buildRecordCard(record)).toList(),
+            ..._filteredRecords.map((record) => _buildRecordCard(record)),
           ],
         ),
       ),
@@ -2939,7 +3635,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
     final currentMonth = DateTime.now().month;
     final currentYear = DateTime.now().year;
     
-    final monthlyRecords = EmployeeData.currentEmployee.workStats.recentAttendance
+    final monthlyRecords = EmployeeData.currentEmployee?.workStats.recentAttendance ?? []
         .where((record) {
           final recordDate = DateTime.parse(record.date);
           return recordDate.month == currentMonth && recordDate.year == currentYear;
@@ -2954,13 +3650,10 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
       switch (record.status) {
         case 'Present':
           present++;
-          break;
         case 'Late Arrival':
           late++;
-          break;
         case 'Absent':
           absent++;
-          break;
       }
     }
     
@@ -2979,7 +3672,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
 // Profile Screen
 class ProfileScreen extends StatefulWidget {
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
@@ -3004,7 +3697,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = EmployeeData.currentEmployee;
+    final currentUser = GlobalState.currentEmployee;
+    
+    // If no user is logged in, show login prompt
+    if (currentUser == null) {
+      return Scaffold(
+        backgroundColor: Colors.grey[50],
+        appBar: AppBar(
+          title: Text(
+            'Profile',
+            style: GoogleFonts.outfit(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          foregroundColor: Colors.black87,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.person_outline,
+                size: 80,
+                color: Colors.grey[400],
+              ),
+              SizedBox(height: 20),
+              Text(
+                'No User Logged In',
+                style: GoogleFonts.outfit(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Please log in to view your profile',
+                style: GoogleFonts.outfit(
+                  fontSize: 16,
+                  color: Colors.grey[500],
+                ),
+              ),
+              SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.indigo[600],
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                ),
+                child: Text(
+                  'Go to Login',
+                  style: GoogleFonts.outfit(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -3225,7 +3987,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (currentUser.hasRegisteredFace) ...[
+            if (currentUser?.hasRegisteredFace ?? false) ...[
               Text('You have registered face data.'),
               SizedBox(height: 16),
               ElevatedButton(
@@ -3271,12 +4033,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _showEditProfileDialog(BuildContext context) {
     final currentUser = EmployeeData.currentEmployee;
-    final nameController = TextEditingController(text: currentUser.name);
-    final emailController = TextEditingController(text: currentUser.email);
-    final phoneController = TextEditingController(text: currentUser.phone);
-    final addressController = TextEditingController(text: currentUser.address);
-    final emergencyContactController = TextEditingController(text: currentUser.emergencyContact);
-    final emergencyPhoneController = TextEditingController(text: currentUser.emergencyPhone);
+    final nameController = TextEditingController(text: currentUser?.name ?? '');
+    final emailController = TextEditingController(text: currentUser?.email ?? '');
+    final phoneController = TextEditingController(text: currentUser?.phone ?? '');
+    final addressController = TextEditingController(text: currentUser?.address ?? '');
+    final emergencyContactController = TextEditingController(text: currentUser?.emergencyContact ?? '');
+    final emergencyPhoneController = TextEditingController(text: currentUser?.emergencyPhone ?? '');
 
     showDialog(
       context: context,
@@ -3365,14 +4127,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 // Face Registration Screen
 class FaceRegistrationScreen extends StatefulWidget {
   @override
-  _FaceRegistrationScreenState createState() => _FaceRegistrationScreenState();
+  State<FaceRegistrationScreen> createState() => _FaceRegistrationScreenState();
 }
 
 class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
   bool _isCapturing = false;
   bool _isProcessing = false;
-  String? _capturedImagePath;
-  String? _faceData;
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
 
@@ -3391,15 +4151,18 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
   Future<void> _initializeCamera() async {
     try {
       final cameras = await availableCameras();
-      if (cameras.isNotEmpty) {
+      
+      if (cameras.isNotEmpty && mounted) {
         _cameraController = CameraController(
           cameras.first,
           ResolutionPreset.medium,
         );
         await _cameraController!.initialize();
+        if (mounted) {
         setState(() {
           _isCameraInitialized = true;
         });
+        }
       }
     } catch (e) {
       print('Error initializing camera: $e');
@@ -3512,7 +4275,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
                       ),
                       
                       // Placeholder for symmetry
-                      Container(width: 60, height: 60),
+                      SizedBox(width: 60, height: 60),
                     ],
                   ),
                 ),
@@ -3529,10 +4292,12 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
       return;
     }
 
+    if (mounted) {
     setState(() {
       _isCapturing = true;
       _isProcessing = true;
     });
+    }
 
     try {
       // Take picture
@@ -3544,12 +4309,12 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
       // Simulate face data extraction
       final faceData = 'face_data_${DateTime.now().millisecondsSinceEpoch}';
       
+      if (mounted) {
       setState(() {
-        _capturedImagePath = image.path;
-        _faceData = faceData;
         _isCapturing = false;
         _isProcessing = false;
       });
+      }
       
       // Register face with employee data
       EmployeeData.registerFace(image.path, faceData);
@@ -3562,12 +4327,14 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
         _isProcessing = false;
       });
       
+      if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error capturing face: $e'),
           backgroundColor: Colors.red,
         ),
       );
+      }
     }
   }
 
@@ -3601,14 +4368,12 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
 // Face Verification Screen
 class FaceVerificationScreen extends StatefulWidget {
   @override
-  _FaceVerificationScreenState createState() => _FaceVerificationScreenState();
+  State<FaceVerificationScreen> createState() => _FaceVerificationScreenState();
 }
 
 class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   bool _isScanning = false;
   bool _isProcessing = false;
-  String? _verificationResult;
-  String? _errorMessage;
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
 
@@ -3627,15 +4392,17 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   Future<void> _initializeCamera() async {
     try {
       final cameras = await availableCameras();
-      if (cameras.isNotEmpty) {
+      if (cameras.isNotEmpty && mounted) {
         _cameraController = CameraController(
           cameras.first,
           ResolutionPreset.medium,
         );
         await _cameraController!.initialize();
+        if (mounted) {
         setState(() {
           _isCameraInitialized = true;
         });
+        }
       }
     } catch (e) {
       print('Error initializing camera: $e');
@@ -3748,7 +4515,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
                       ),
                       
                       // Placeholder for symmetry
-                      Container(width: 60, height: 60),
+                      SizedBox(width: 60, height: 60),
                     ],
                   ),
                 ),
@@ -3762,53 +4529,80 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
   Future<void> _startFaceVerification() async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      _showVerificationError('Camera not available. Please try again.');
       return;
     }
 
-    setState(() {
-      _isScanning = true;
-      _isProcessing = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isScanning = true;
+        _isProcessing = true;
+      });
+    }
 
     try {
-      // Take picture
-      final XFile image = await _cameraController!.takePicture();
+      print('👤 Starting face verification process...');
       
-      // Simulate face verification process
-      await Future.delayed(Duration(seconds: 3));
-      
-      // Check if user has registered face data
-      final currentUser = EmployeeData.currentEmployee;
-      if (!currentUser.hasRegisteredFace) {
-        setState(() {
-          _isScanning = false;
-          _isProcessing = false;
-        });
+      // Check if user has registered face data first
+      final currentUser = GlobalState.currentEmployee;
+      if (currentUser?.hasRegisteredFace != true) {
+        print('❌ No registered face found for user');
+        if (mounted) {
+          setState(() {
+            _isScanning = false;
+            _isProcessing = false;
+          });
+        }
         _showVerificationError('No registered face found. Please register your face first in Profile > Manage Face Data.');
         return;
       }
       
-      // Simulate verification result (20% success rate for better security)
-      final isVerified = DateTime.now().millisecondsSinceEpoch % 5 == 0;
+      // Take picture with timeout
+      print('📸 Taking picture...');
+      await _cameraController!.takePicture().timeout(
+        Duration(seconds: 10),
+        onTimeout: () {
+          throw Exception('Camera timeout');
+        },
+      );
       
-      setState(() {
-        _isScanning = false;
-        _isProcessing = false;
-        _verificationResult = isVerified ? 'success' : 'failed';
-      });
+      // Simulate face verification process with timeout
+      print('🔍 Processing face verification...');
+      await Future.delayed(Duration(seconds: 2)).timeout(
+        Duration(seconds: 5),
+        onTimeout: () {
+          throw Exception('Verification timeout');
+        },
+      );
+      
+      // Simulate verification result (80% success rate for testing)
+      final isVerified = DateTime.now().millisecondsSinceEpoch % 5 != 0;
+      
+      print('✅ Face verification result: $isVerified');
+      
+      if (mounted) {
+        setState(() {
+          _isScanning = false;
+          _isProcessing = false;
+        });
+      }
       
       if (isVerified) {
+        print('🎉 Face verification successful!');
         _showVerificationSuccess();
       } else {
+        print('❌ Face verification failed');
         _showVerificationError('Face verification failed. Please ensure good lighting and try again.');
       }
       
     } catch (e) {
-      setState(() {
-        _isScanning = false;
-        _isProcessing = false;
-      });
-      
+      print('❌ Face verification error: $e');
+      if (mounted) {
+        setState(() {
+          _isScanning = false;
+          _isProcessing = false;
+        });
+      }
       _showVerificationError('Error during verification: $e');
     }
   }
@@ -3853,8 +4647,18 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
         content: Text(message),
         actions: [
           ElevatedButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context, false); // Return failure
+            },
             child: Text('Try Again'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context, false); // Return failure
+            },
+            child: Text('Cancel'),
           ),
         ],
       ),
@@ -4225,29 +5029,73 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           width: double.infinity,
           height: 56,
           child: ElevatedButton(
-            onPressed: () => _performCheckIn(attendanceMethod),
+            onPressed: (_isLoading || GlobalState.currentEmployee == null) ? null : () {
+              print('🔍 Check-in button pressed with method: $attendanceMethod');
+              _checkIn(attendanceMethod);
+            },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[600],
+              backgroundColor: _isLoading 
+                ? Colors.grey[400] 
+                : GlobalState.currentEmployee == null 
+                  ? Colors.orange[600] 
+                  : Colors.green[600],
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
               elevation: 8,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.login, size: 24),
-                SizedBox(width: 12),
-                Text(
-                  'Check In',
-                  style: GoogleFonts.outfit(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+            child: _isLoading 
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      'Checking In...',
+                      style: GoogleFonts.outfit(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                )
+              : GlobalState.currentEmployee == null
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.person_off, size: 24),
+                      SizedBox(width: 12),
+                      Text(
+                        'Please Log In First',
+                        style: GoogleFonts.outfit(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.login, size: 24),
+                      SizedBox(width: 12),
+                      Text(
+                        'Check In',
+                        style: GoogleFonts.outfit(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
         ),
       ],
@@ -4327,7 +5175,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Widget _buildAttendanceSummary() {
-    final currentUser = EmployeeData.currentEmployee;
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -4394,7 +5241,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   Widget _buildRecentHistory() {
     final currentUser = EmployeeData.currentEmployee;
-    final recentAttendance = currentUser.workStats.recentAttendance.take(5).toList();
+    final recentAttendance = currentUser?.workStats.recentAttendance ?? [].take(5).toList();
     
     return Container(
       padding: EdgeInsets.all(20),
@@ -4421,7 +5268,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             ),
           ),
           SizedBox(height: 16),
-          ...recentAttendance.map((record) => _buildHistoryItem(record)).toList(),
+          ...recentAttendance.map((record) => _buildHistoryItem(record)),
         ],
       ),
     );
@@ -4488,140 +5335,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
   }
 
-  void _performCheckIn(String method) {
-    print('Performing check-in via $method'); // Debug log
-    
-    // Check if facial recognition is required
-    if (method == 'facial') {
-      final currentUser = EmployeeData.currentEmployee;
-      if (!currentUser.hasRegisteredFace) {
-        _showError('Please register your face first in Profile > Manage Face Data');
-        return;
-      }
-      
-      // Navigate to face verification
-      _showFaceVerificationForCheckIn();
-      return;
-    }
-    
-    // For QR code or other methods, proceed directly
-    if (method == 'qr') {
-      _showQRScanner();
-    } else {
-      _processCheckIn(method);
-    }
-  }
 
-  void _showFaceVerificationForCheckIn() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FaceVerificationScreen(),
-      ),
-    ).then((result) {
-      if (result == true) {
-        _processCheckIn('facial');
-      } else {
-        _showError('Face verification failed. Please try again.');
-      }
-    });
-  }
 
-  void _showQRScanner() {
-    // Simulate QR code scanning
-    _showLoading(true);
-    
-    Timer(Duration(seconds: 2), () {
-      _showLoading(false);
-      
-      // Simulate QR code validation (90% success rate)
-      final isQRValid = DateTime.now().millisecondsSinceEpoch % 10 != 0;
-      
-      if (isQRValid) {
-        _processCheckIn('qr');
-      } else {
-        _showError('Invalid QR code. Please try again.');
-      }
-    });
-  }
-
-  void _processCheckIn(String method) {
-    // Show loading
-    _showLoading(true);
-    
-    // Simulate processing time
-    Timer(Duration(milliseconds: 1500), () {
-      final checkInTimeStr = TimeOfDay.now().format(context);
-      final checkInStatus = EmployeeData._getCheckInStatus(checkInTimeStr);
-      
-      print('Check-in time: $checkInTimeStr'); // Debug log
-      print('Check-in status: $checkInStatus'); // Debug log
-      
-      // Update global state
-      GlobalState.setCheckInStatus(true, checkInTimeStr, method);
-      
-      // Start the timer
-      _startTimer();
-      
-      
-      setState(() {
-        // Trigger rebuild
-      });
-      
-      print('State updated - isCheckedIn: ${GlobalState.isCheckedIn}, checkInTime: ${GlobalState.checkInTime}'); // Debug log
-      
-      // Hide loading
-      _showLoading(false);
-      
-      // Show success feedback
-      _showSuccessFeedback(checkInStatus == 'Late' ? 'late' : 'success');
-
-      // Add attendance record to real-time data
-      final attendanceRecord = AttendanceRecord(
-        date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-        checkIn: checkInTimeStr,
-        checkOut: null,
-        hours: 0.0,
-        status: checkInStatus == 'Late' ? 'Late Arrival' : 'Present',
-        method: method,
-        location: 'Office',
-      );
-
-      EmployeeData.addAttendanceRecord(attendanceRecord);
-      print('Employee data updated and saved'); // Debug log
-
-      // Show success message
-      String message;
-      Color backgroundColor;
-      if (checkInStatus == 'Late') {
-        message = 'Checked in late via $method ($checkInTimeStr)';
-        backgroundColor = Colors.orange[600]!;
-      } else {
-        message = 'Checked in successfully via $method ($checkInTimeStr)';
-        backgroundColor = Colors.green[600]!;
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: backgroundColor,
-          behavior: SnackBarBehavior.floating,
-          action: SnackBarAction(
-            label: 'View Dashboard',
-            textColor: Colors.white,
-            onPressed: () {
-              Navigator.pop(context); // Go back to dashboard
-            },
-          ),
-        ),
-      );
-    });
-  }
 
   void _checkOut() {
     final currentUser = EmployeeData.currentEmployee;
     
-    if (currentUser.hasRegisteredFace) {
+    if (currentUser?.hasRegisteredFace ?? false) {
       _showFaceVerificationForCheckOut();
     } else {
       _performCheckOut();
@@ -4641,48 +5361,176 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     });
   }
 
-  void _performCheckOut() {
-    final checkOutTimeStr = TimeOfDay.now().format(context);
-    final currentUser = EmployeeData.currentEmployee;
+  // Check-in method using hybrid service
+  void _checkIn(String method) async {
+    print('🚀 Starting check-in process with method: $method');
     
-    // Find the latest attendance record for today
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final todayRecords = currentUser.workStats.recentAttendance
-        .where((record) => record.date == today)
-        .toList();
+    // Check if user is logged in
+    if (GlobalState.currentEmployee == null) {
+      print('❌ No user logged in, cannot check in');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Please log in first to check in'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+      return;
+    }
     
-    if (todayRecords.isNotEmpty) {
-      final latestRecord = todayRecords.first;
-      final checkInTime = _parseTimeString(latestRecord.checkIn!);
-      final checkOutTime = _parseTimeString(checkOutTimeStr);
-      final hoursWorked = _calculateHoursWorked(checkInTime, checkOutTime);
-      
-      // Determine check-out status
-      final checkOutStatus = EmployeeData._getCheckOutStatus(checkOutTimeStr);
-      
-      // Update the record - create a new record with updated values
-      final updatedRecord = AttendanceRecord(
-        date: latestRecord.date,
-        checkIn: latestRecord.checkIn,
-        checkOut: checkOutTimeStr,
-        hours: hoursWorked,
-        status: checkOutStatus == 'Early' ? 'Early Departure' : latestRecord.status,
-        method: latestRecord.method,
-        location: latestRecord.location,
+    // Handle facial recognition method
+    if (method == 'facial') {
+      print('👤 Starting facial recognition check-in...');
+      _showFaceVerificationForCheckIn();
+      return;
+    }
+    
+    // Handle QR code method
+    if (method == 'qr') {
+      print('📱 Starting QR code check-in...');
+      _showQRScannerForCheckIn();
+      return;
+    }
+    
+    // Fallback to direct check-in for other methods
+    await _performDirectCheckIn(method);
+  }
+
+  void _showFaceVerificationForCheckIn() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FaceVerificationScreen(),
+      ),
+    ).then((result) {
+      if (result == true) {
+        _performDirectCheckIn('facial');
+      } else {
+        print('❌ Face verification failed or cancelled');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Face verification failed'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  void _showQRScannerForCheckIn() {
+    // For now, simulate QR scanning with a simple dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('QR Code Scanner'),
+        content: Text('QR Code scanning functionality will be implemented here. For now, proceeding with check-in.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _performDirectCheckIn('qr');
+            },
+            child: Text('Proceed'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _performDirectCheckIn(String method) async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+    
+    try {
+      print('📞 Calling HybridDataService.checkIn...');
+      final result = await HybridDataService.checkIn(
+        method: method,
+        location: 'Office', // You can add location detection here
       );
       
-      // Replace the old record with the updated one
-      final index = currentUser.workStats.recentAttendance.indexOf(latestRecord);
-      if (index != -1) {
-        currentUser.workStats.recentAttendance[index] = updatedRecord;
-      }
+      print('📋 Check-in result: $result');
       
-      // Update work statistics - recalculate from all attendance records
-      final newStats = EmployeeData._calculateWorkStatistics(currentUser.workStats.recentAttendance);
-      EmployeeData.updateWorkStats(newStats);
+      if (result['success'] == true && mounted) {
+        final checkInTimeStr = TimeOfDay.now().format(context);
+        
+        print('✅ Check-in completed: $checkInTimeStr');
+        
+        // Update global state
+        GlobalState.isCheckedIn = true;
+        GlobalState.checkInTime = DateTime.now().toIso8601String();
+        GlobalState.checkInMethod = method;
+        
+        // Start timer
+        _startTimer();
+        
+        setState(() {});
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Checked in successfully at $checkInTimeStr'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else if (mounted) {
+        print('❌ Check-in failed: ${result['message']}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? 'Check-in failed'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      print('❌ Check-in error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Check-in failed: $e'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _performCheckOut() async {
+    try {
+      // Use Hybrid service for check-out
+      final result = await HybridDataService.checkOut(
+        method: 'manual', // You can track the check-out method
+        location: 'Office', // You can add location detection here
+      );
+      
+      if (result['success'] == true && mounted) {
+        final checkOutTimeStr = TimeOfDay.now().format(context);
+        final attendance = result['attendance'];
+        final hoursWorked = attendance?.workHours ?? 0.0;
       
       print('Check-out completed: $checkOutTimeStr, Hours: $hoursWorked');
-    }
     
     // Reset global state
     GlobalState.resetCheckInStatus();
@@ -4696,32 +5544,22 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Checked out successfully at $checkOutTimeStr'),
+        content: Text('Checked out successfully at $checkOutTimeStr\nHours worked: ${hoursWorked.toStringAsFixed(2)}'),
         backgroundColor: Colors.blue[600],
         behavior: SnackBarBehavior.floating,
       ),
     );
+      } else if (mounted) {
+        _showError(result['message'] ?? 'Check-out failed');
+      }
+    } catch (e) {
+      print('Check-out error: $e');
+      if (mounted) {
+        _showError('Check-out failed: $e');
+      }
+    }
   }
 
-  TimeOfDay _parseTimeString(String timeStr) {
-    final timeParts = timeStr.split(' ');
-    final time = timeParts[0].split(':');
-    final hour = int.parse(time[0]);
-    final minute = int.parse(time[1]);
-    final isPM = timeParts.length > 1 && timeParts[1] == 'PM';
-
-    return TimeOfDay(
-      hour: isPM && hour != 12 ? hour + 12 : (hour == 12 && !isPM ? 0 : hour),
-      minute: minute,
-    );
-  }
-
-  double _calculateHoursWorked(TimeOfDay checkIn, TimeOfDay checkOut) {
-    final checkInMinutes = checkIn.hour * 60 + checkIn.minute;
-    final checkOutMinutes = checkOut.hour * 60 + checkOut.minute;
-    final totalMinutes = checkOutMinutes - checkInMinutes;
-    return totalMinutes / 60.0;
-  }
 
   String _calculateHours() {
     if (checkInTime == null) return '0.0';
@@ -4803,11 +5641,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     );
   }
 
-  void _showLoading(bool loading) {
-    setState(() {
-      _isLoading = loading;
-    });
-  }
 
   void _showError(String message) {
     setState(() {
@@ -4823,103 +5656,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     });
   }
 
-  void _showSuccessFeedback(String type) {
-    // Haptic feedback
-    // HapticFeedback.lightImpact(); // Uncomment when haptic_feedback package is added
-    
-    // Visual feedback with animation
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          padding: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 20,
-                offset: Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: type == 'success' ? Colors.green[100] : Colors.orange[100],
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  type == 'success' ? Icons.check_circle : Icons.schedule,
-                  color: type == 'success' ? Colors.green[600] : Colors.orange[600],
-                  size: 40,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                type == 'success' ? 'Check-in Successful!' : 'Late Check-in',
-                style: GoogleFonts.outfit(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                type == 'success' 
-                  ? 'You have successfully checked in'
-                  : 'You checked in late today',
-                style: GoogleFonts.outfit(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: type == 'success' ? Colors.green[600] : Colors.orange[600],
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                child: Text('Continue'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-
-    // Auto-close after 3 seconds
-    Timer(Duration(seconds: 3), () {
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      }
-    });
-  }
 
   String _getCheckInStatusText() {
     if (checkInTime == null) return '';
-    final status = EmployeeData._getCheckInStatus(checkInTime!);
+    final status = EmployeeData.getCheckInStatus(checkInTime!);
     return status == 'Late' ? 'Late Arrival' : 'On Time';
   }
 
   Color _getCheckInStatusColor() {
     if (checkInTime == null) return Colors.grey;
-    final status = EmployeeData._getCheckInStatus(checkInTime!);
+    final status = EmployeeData.getCheckInStatus(checkInTime!);
     return status == 'Late' ? Colors.orange : Colors.green;
   }
 
@@ -4953,6 +5699,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         final now = DateTime.now();
         _elapsedTime = now.difference(checkInDateTime);
         
+        // Break time notifications are handled in DashboardScreen
+        
         if (mounted) {
           setState(() {});
         }
@@ -4968,6 +5716,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
+
 
 }
 

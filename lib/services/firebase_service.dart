@@ -402,6 +402,60 @@ class FirebaseService {
     }
   }
 
+  // Upload attendance photo
+  static Future<String?> uploadAttendancePhoto(
+    String employeeId,
+    Uint8List imageBytes,
+    String timestamp,
+  ) async {
+    try {
+      final ref = _storage.ref('attendance/$employeeId/attendance_$timestamp.jpg');
+      final uploadTask = ref.putData(imageBytes);
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      return downloadUrl;
+    } catch (e) {
+      print('Upload attendance photo error: $e');
+      return null;
+    }
+  }
+
+  // Delete file from storage
+  static Future<bool> deleteFile(String filePath) async {
+    try {
+      final ref = _storage.ref(filePath);
+      await ref.delete();
+      return true;
+    } catch (e) {
+      print('Delete file error: $e');
+      return false;
+    }
+  }
+
+  // Get file download URL
+  static Future<String?> getDownloadUrl(String filePath) async {
+    try {
+      final ref = _storage.ref(filePath);
+      return await ref.getDownloadURL();
+    } catch (e) {
+      print('Get download URL error: $e');
+      return null;
+    }
+  }
+
+  // List files in a directory
+  static Future<List<Reference>> listFiles(String path) async {
+    try {
+      final ref = _storage.ref(path);
+      final result = await ref.listAll();
+      return result.items;
+    } catch (e) {
+      print('List files error: $e');
+      return [];
+    }
+  }
+
   // ==================== NOTIFICATIONS ====================
 
   // Subscribe to notifications
