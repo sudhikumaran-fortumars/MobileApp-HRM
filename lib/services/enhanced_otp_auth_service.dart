@@ -1,16 +1,28 @@
 import 'dart:convert';
+<<<<<<< HEAD
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models.dart';
+=======
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../main.dart';
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
 
 class EnhancedOTPAuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   
+<<<<<<< HEAD
   // Test mode flag - set to false for real Firebase Phone Auth
   static const bool _isTestMode = false;
+=======
+  // Test mode flag - set to true for testing without Firebase
+  static const bool _isTestMode = true;
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
 
 
   // ==================== PHONE NUMBER VERIFICATION ====================
@@ -37,6 +49,7 @@ class EnhancedOTPAuthService {
         };
       }
 
+<<<<<<< HEAD
       // Additional validation for common phone number patterns
       if (cleanPhone.length > 15) {
         print('❌ Phone number too long: $cleanPhone');
@@ -46,6 +59,8 @@ class EnhancedOTPAuthService {
         };
       }
 
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       // Test mode - simulate OTP sending
       if (_isTestMode) {
         print('🧪 TEST MODE: Simulating OTP send...');
@@ -67,14 +82,18 @@ class EnhancedOTPAuthService {
 
       print('🚀 Sending OTP via Firebase...');
       
+<<<<<<< HEAD
       // Use Completer to handle async verification
       final completer = Completer<Map<String, dynamic>>();
       
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       // Send OTP using Firebase Phone Auth
       await _auth.verifyPhoneNumber(
         phoneNumber: fullPhoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
           print('✅ Auto-verification completed');
+<<<<<<< HEAD
           try {
             final result = await _signInWithCredential(credential, fullPhoneNumber);
             if (!completer.isCompleted) {
@@ -89,16 +108,22 @@ class EnhancedOTPAuthService {
               });
             }
           }
+=======
+          await _signInWithCredential(credential, fullPhoneNumber);
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
         },
         verificationFailed: (FirebaseAuthException e) {
           print('❌ Verification failed: ${e.code} - ${e.message}');
           print('❌ Error details: ${e.toString()}');
+<<<<<<< HEAD
           if (!completer.isCompleted) {
             completer.complete({
               'success': false,
               'message': 'Failed to send OTP: ${e.message}',
             });
           }
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
         },
         codeSent: (String verificationId, int? resendToken) async {
           print('✅ OTP sent successfully!');
@@ -113,6 +138,7 @@ class EnhancedOTPAuthService {
             await prefs.setInt('resendToken', resendToken);
             print('🔄 Resend token stored');
           }
+<<<<<<< HEAD
           
           if (!completer.isCompleted) {
             completer.complete({
@@ -130,10 +156,16 @@ class EnhancedOTPAuthService {
               'message': 'OTP sending timeout. Please try again.',
             });
           }
+=======
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          print('⏰ Auto-retrieval timeout');
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
         },
         timeout: const Duration(seconds: 60),
       );
 
+<<<<<<< HEAD
       // Wait for the verification process to complete
       final result = await completer.future.timeout(
         Duration(seconds: 65),
@@ -147,6 +179,14 @@ class EnhancedOTPAuthService {
       );
       
       return result;
+=======
+      print('✅ OTP send process completed');
+      return {
+        'success': true,
+        'message': 'OTP sent successfully to $fullPhoneNumber',
+        'phoneNumber': fullPhoneNumber,
+      };
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
     } catch (e) {
       print('❌ OTP send error: ${e.toString()}');
       print('❌ Error type: ${e.runtimeType}');
@@ -212,9 +252,12 @@ class EnhancedOTPAuthService {
         }
       }
 
+<<<<<<< HEAD
       // Real Firebase verification
       print('🔐 Verifying OTP with Firebase...');
       
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       // Create credential
       final credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
@@ -237,6 +280,7 @@ class EnhancedOTPAuthService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final phoneNumber = prefs.getString('phoneNumber');
+<<<<<<< HEAD
       final countryCode = prefs.getString('countryCode');
       final resendToken = prefs.getInt('resendToken');
 
@@ -336,6 +380,45 @@ class EnhancedOTPAuthService {
       return {
         'success': false,
         'message': 'Failed to resend OTP: $e',
+=======
+      final resendToken = prefs.getInt('resendToken');
+
+      if (phoneNumber == null) {
+        return {
+          'success': false,
+          'message': 'No phone number found',
+        };
+      }
+
+      // Resend OTP
+      await _auth.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await _signInWithCredential(credential, phoneNumber);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          print('Resend verification failed: ${e.message}');
+        },
+        codeSent: (String verificationId, int? resendToken) async {
+          await prefs.setString('verificationId', verificationId);
+          if (resendToken != null) {
+            await prefs.setInt('resendToken', resendToken);
+          }
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+        timeout: const Duration(seconds: 60),
+        forceResendingToken: resendToken,
+      );
+
+      return {
+        'success': true,
+        'message': 'OTP resent successfully',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Failed to resend OTP: ${e.toString()}',
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       };
     }
   }

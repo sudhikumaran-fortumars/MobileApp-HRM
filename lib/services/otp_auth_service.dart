@@ -2,7 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'database_helper.dart';
+<<<<<<< HEAD
 import '../models.dart';
+=======
+import '../main.dart';
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
 
 class OTPAuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;

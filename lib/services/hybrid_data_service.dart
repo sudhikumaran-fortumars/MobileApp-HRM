@@ -3,7 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'database_helper.dart';
 import 'firebase_service.dart';
 import 'enhanced_otp_auth_service.dart';
+<<<<<<< HEAD
 import '../models.dart';
+=======
+import '../main.dart';
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
 
 class HybridDataService {
   static final DatabaseHelper _dbHelper = DatabaseHelper();

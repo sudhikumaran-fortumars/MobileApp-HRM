@@ -2,7 +2,11 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_service.dart';
+<<<<<<< HEAD
 import '../models.dart';
+=======
+import '../main.dart';
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
 
 class AppDataService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;

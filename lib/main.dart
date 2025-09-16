@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -6,6 +7,13 @@ import 'dart:io' show File;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+=======
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_core/firebase_core.dart';
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
 import 'package:camera/camera.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,11 +22,17 @@ import 'services/break_time_service.dart';
 import 'services/app_data_service.dart';
 import 'services/hybrid_data_service.dart';
 import 'services/enhanced_otp_auth_service.dart';
+<<<<<<< HEAD
 import 'services/sms_otp_service.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import './utils/data_seeder.dart';
 import 'models.dart';
+=======
+import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:country_code_picker/country_code_picker.dart';
+import './utils/data_seeder.dart';
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
 
 Future<void> _loadStoredUserData() async {
   try {
@@ -274,8 +288,11 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _showPhoneLogin = true;
   String _phoneNumber = '';
   String _countryCode = '+91';
+<<<<<<< HEAD
   int _resendCountdown = 0;
   Timer? _resendTimer;
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
 
   Future<void> _sendOTP() async {
     if (!mounted) return;
@@ -294,9 +311,13 @@ class _LoginScreenState extends State<LoginScreen> {
             setState(() {
               _isOTPSent = true;
               _phoneNumber = result['phoneNumber'];
+<<<<<<< HEAD
               _resendCountdown = 60; // 60 seconds countdown
             });
             _startResendCountdown();
+=======
+            });
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('OTP sent to $_phoneNumber'),
@@ -494,6 +515,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+<<<<<<< HEAD
   void _startResendCountdown() {
     _resendTimer?.cancel();
     _resendTimer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -513,6 +535,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _resendOTP() async {
     if (!mounted || _resendCountdown > 0) return;
+=======
+  Future<void> _resendOTP() async {
+    if (!mounted) return;
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
     
     setState(() {
       _isLoading = true;
@@ -523,10 +549,13 @@ class _LoginScreenState extends State<LoginScreen> {
       
       if (mounted) {
         if (result['success'] == true) {
+<<<<<<< HEAD
           setState(() {
             _resendCountdown = 60; // Reset countdown
           });
           _startResendCountdown();
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('OTP resent successfully'),
@@ -620,6 +649,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       : 'Enter your phone number to receive OTP',
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
+<<<<<<< HEAD
                 if (_isOTPSent) ...[
                   SizedBox(height: 8),
                   Container(
@@ -646,6 +676,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ],
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
                 SizedBox(height: 40),
 
                 if (!_isOTPSent && !_showRegistration) ...[
@@ -875,6 +907,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ] else if (_isOTPSent && !_showRegistration) ...[
+<<<<<<< HEAD
                   // OTP Sent Confirmation
                   Container(
                     padding: EdgeInsets.all(16),
@@ -921,6 +954,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
                   // OTP Input Field
                   PinCodeTextField(
                     appContext: context,
@@ -982,6 +1017,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Resend OTP Button
                   TextButton(
+<<<<<<< HEAD
                     onPressed: (_isLoading || _resendCountdown > 0) ? null : _resendOTP,
                     child: Text(
                       _resendCountdown > 0 
@@ -991,6 +1027,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: _resendCountdown > 0 
                           ? Colors.grey[600]
                           : Color(0xFF1976D2),
+=======
+                    onPressed: _isLoading ? null : _resendOTP,
+                    child: Text(
+                      'Resend OTP',
+                      style: TextStyle(
+                        color: Color(0xFF1976D2),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1214,11 +1257,266 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _departmentController.dispose();
     _positionController.dispose();
+<<<<<<< HEAD
     _resendTimer?.cancel();
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
     super.dispose();
   }
 }
 
+<<<<<<< HEAD
+=======
+// Models
+class Employee {
+  final String empId;
+  final String name;
+  final String email;
+  final String phone;
+  final String role;
+  final String department;
+  final String shift;
+  final String status;
+  final double hourlyRate;
+  final Location location;
+  final bool hasRegisteredFace;
+  final String? faceData;
+  final String? faceImagePath;
+  final String? profileImagePath;
+  final DateTime? faceRegistrationDate;
+  final DateTime joinDate;
+  final String address;
+  final String emergencyContact;
+  final String emergencyPhone;
+  final WorkStatistics workStats;
+
+  Employee({
+    required this.empId,
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.role,
+    required this.department,
+    required this.shift,
+    required this.status,
+    required this.hourlyRate,
+    required this.location,
+    required this.joinDate,
+    required this.address,
+    required this.emergencyContact,
+    required this.emergencyPhone,
+    required this.workStats,
+    this.hasRegisteredFace = false,
+    this.faceData,
+    this.faceImagePath,
+    this.profileImagePath,
+    this.faceRegistrationDate,
+  });
+
+  Employee copyWith({
+    String? empId,
+    String? name,
+    String? email,
+    String? phone,
+    String? role,
+    String? department,
+    String? shift,
+    String? status,
+    double? hourlyRate,
+    Location? location,
+    String? address,
+    String? emergencyContact,
+    String? emergencyPhone,
+    WorkStatistics? workStats,
+    bool? hasRegisteredFace,
+    String? faceData,
+    String? faceImagePath,
+    String? profileImagePath,
+    DateTime? faceRegistrationDate,
+    DateTime? joinDate,
+  }) {
+    return Employee(
+      empId: empId ?? this.empId,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      role: role ?? this.role,
+      department: department ?? this.department,
+      shift: shift ?? this.shift,
+      status: status ?? this.status,
+      hourlyRate: hourlyRate ?? this.hourlyRate,
+      location: location ?? this.location,
+      address: address ?? this.address,
+      emergencyContact: emergencyContact ?? this.emergencyContact,
+      emergencyPhone: emergencyPhone ?? this.emergencyPhone,
+      workStats: workStats ?? this.workStats,
+      hasRegisteredFace: hasRegisteredFace ?? this.hasRegisteredFace,
+      faceData: faceData ?? this.faceData,
+      faceImagePath: faceImagePath ?? this.faceImagePath,
+      profileImagePath: profileImagePath ?? this.profileImagePath,
+      faceRegistrationDate: faceRegistrationDate ?? this.faceRegistrationDate,
+      joinDate: joinDate ?? this.joinDate,
+    );
+  }
+}
+
+class WorkStatistics {
+  final int totalDaysWorked;
+  final double totalHoursWorked;
+  final int leaveDaysUsed;
+  final int leaveDaysRemaining;
+  final double attendanceRate;
+  final double averageDailyHours;
+  final int lateArrivals;
+  final int earlyDepartures;
+  final List<AttendanceRecord> recentAttendance;
+
+  WorkStatistics({
+    required this.totalDaysWorked,
+    required this.totalHoursWorked,
+    required this.leaveDaysUsed,
+    required this.leaveDaysRemaining,
+    required this.attendanceRate,
+    required this.averageDailyHours,
+    required this.lateArrivals,
+    required this.earlyDepartures,
+    required this.recentAttendance,
+  });
+}
+
+class Location {
+  final double lat;
+  final double lng;
+
+  Location({required this.lat, required this.lng});
+}
+
+class AttendanceRecord {
+  final String date;
+  final String? checkIn;
+  final String? checkOut;
+  final String status;
+  final double hours;
+  final String location;
+  final String method;
+
+  AttendanceRecord({
+    required this.date,
+    this.checkIn,
+    this.checkOut,
+    required this.status,
+    required this.hours,
+    required this.location,
+    required this.method,
+  });
+}
+
+
+class LeaveRequest {
+  final String id;
+  final String empId;
+  final String type;
+  final String startDate;
+  final String endDate;
+  final String reason;
+  final String status;
+  final DateTime appliedDate;
+
+  LeaveRequest({
+    required this.id,
+    required this.empId,
+    required this.type,
+    required this.startDate,
+    required this.endDate,
+    required this.reason,
+    required this.status,
+    required this.appliedDate,
+  });
+}
+
+// Attendance time constants
+class AttendanceConstants {
+  static const TimeOfDay standardCheckIn = TimeOfDay(hour: 9, minute: 0);
+  static const TimeOfDay standardCheckOut = TimeOfDay(hour: 18, minute: 0);
+  static const int lateToleranceMinutes = 10; // 10 minutes late tolerance
+  static const int earlyCheckoutToleranceMinutes = 30; // 30 minutes early checkout tolerance
+  static const int lateArrivalsForHalfDay = 3; // 3 late arrivals = 0.5 day leave
+}
+
+// Global state management for persistent check-in status
+class GlobalState {
+  static bool _isCheckedIn = false;
+  static String? _checkInTime;
+  static String? _checkInMethod;
+  static Employee? _currentEmployee;
+  static Timer? _updateTimer;
+  static List<VoidCallback> _listeners = [];
+  
+  static bool get isCheckedIn => _isCheckedIn;
+  static String? get checkInTime => _checkInTime;
+  static String? get checkInMethod => _checkInMethod;
+  static Employee? get currentEmployee => _currentEmployee;
+  
+  static void setCheckInStatus(bool isCheckedIn, String? checkInTime, String? method) {
+    _isCheckedIn = isCheckedIn;
+    _checkInTime = checkInTime;
+    _checkInMethod = method;
+    _notifyListeners();
+  }
+  
+  static set isCheckedIn(bool value) {
+    _isCheckedIn = value;
+    _notifyListeners();
+  }
+  
+  static set checkInTime(String? value) {
+    _checkInTime = value;
+    _notifyListeners();
+  }
+  
+  static set checkInMethod(String? value) {
+    _checkInMethod = value;
+    _notifyListeners();
+  }
+  
+  static set currentEmployee(Employee? value) {
+    _currentEmployee = value;
+    _notifyListeners();
+  }
+  
+  static void resetCheckInStatus() {
+    _isCheckedIn = false;
+    _checkInTime = null;
+    _checkInMethod = null;
+    _notifyListeners();
+  }
+  
+  static void addListener(VoidCallback listener) {
+    _listeners.add(listener);
+  }
+  
+  static void removeListener(VoidCallback listener) {
+    _listeners.remove(listener);
+  }
+  
+  static void _notifyListeners() {
+    for (var listener in _listeners) {
+      listener();
+    }
+  }
+  
+  static void startUpdateTimer() {
+    _updateTimer?.cancel();
+    _updateTimer = Timer.periodic(Duration(seconds: 1), (_) {
+      _notifyListeners();
+    });
+  }
+  
+  static void stopUpdateTimer() {
+    _updateTimer?.cancel();
+  }
+}
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
 
 // Real-time data management system
 class EmployeeData {
@@ -1246,6 +1544,7 @@ class EmployeeData {
       faceRegistrationDate: DateTime.now(),
     );
     _saveToLocalStorage();
+<<<<<<< HEAD
     
     // Update GlobalState
     GlobalState.currentEmployee = _currentEmployee;
@@ -1270,6 +1569,8 @@ class EmployeeData {
       print('✅ Face data synced to Firebase successfully');
     } catch (e) {
       print('❌ Error syncing face data to Firebase: $e');
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
     }
   }
 
@@ -1834,11 +2135,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: Row(
           children: [
+<<<<<<< HEAD
             Image.asset(
               'assets/images/fortumars_logo.png',
               width: 90,
               height: 90,
               fit: BoxFit.contain,
+=======
+            Icon(
+              Icons.business,
+              size: 40,
+              color: Color(0xFF1976D2),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
             ),
             Expanded(
               child: Center(
@@ -1853,10 +2161,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
+<<<<<<< HEAD
           ],
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
+=======
+            SizedBox(
+              width: 90,
+            ), // Add invisible space on right to balance the logo
+          ],
+        ),
+        centerTitle: true,
+        backgroundColor: Color(0xFFF5F5F5),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
         foregroundColor: Colors.black87,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -2800,6 +3118,7 @@ class _LeaveScreenState extends State<LeaveScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   List<LeaveRequest> leaveRequests = [];
+<<<<<<< HEAD
   
   // Form controllers
   String? selectedLeaveType;
@@ -2818,6 +3137,8 @@ class _LeaveScreenState extends State<LeaveScreen>
     'Bereavement Leave',
     'Other'
   ];
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
 
   @override
   void initState() {
@@ -2826,6 +3147,7 @@ class _LeaveScreenState extends State<LeaveScreen>
     _initializeLeaveRequests();
   }
 
+<<<<<<< HEAD
   @override
   void dispose() {
     _tabController.dispose();
@@ -2833,6 +3155,8 @@ class _LeaveScreenState extends State<LeaveScreen>
     super.dispose();
   }
 
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
   void _initializeLeaveRequests() {
     try {
       if (MockData.leaveRequests.isNotEmpty) {
@@ -2850,9 +3174,12 @@ class _LeaveScreenState extends State<LeaveScreen>
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -2860,6 +3187,7 @@ class _LeaveScreenState extends State<LeaveScreen>
           children: [
             Image.asset(
               'assets/images/fortumars_logo.png',
+<<<<<<< HEAD
               width: isMobile ? 60 : 90,
               height: isMobile ? 60 : 90,
               fit: BoxFit.contain,
@@ -2874,6 +3202,22 @@ class _LeaveScreenState extends State<LeaveScreen>
                   color: Colors.black87,
                 ),
                 textAlign: TextAlign.center,
+=======
+              width: 90,
+              height: 90,
+              fit: BoxFit.contain,
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Leave Management',
+                  style: GoogleFonts.outfit(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
               ),
             ),
           ],
@@ -2885,6 +3229,7 @@ class _LeaveScreenState extends State<LeaveScreen>
           labelColor: Colors.indigo[600],
           unselectedLabelColor: Colors.grey[600],
           indicatorColor: Colors.indigo[600],
+<<<<<<< HEAD
           isScrollable: isMobile,
           tabAlignment: isMobile ? TabAlignment.start : TabAlignment.fill,
           tabs: [
@@ -2915,6 +3260,12 @@ class _LeaveScreenState extends State<LeaveScreen>
                 ),
               ),
             ),
+=======
+          tabs: [
+            Tab(text: 'Apply Leave'),
+            Tab(text: 'My Requests'),
+            Tab(text: 'Balance'),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
           ],
         ),
       ),
@@ -2930,6 +3281,7 @@ class _LeaveScreenState extends State<LeaveScreen>
   }
 
   Widget _buildApplyLeaveTab() {
+<<<<<<< HEAD
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -2955,16 +3307,39 @@ class _LeaveScreenState extends State<LeaveScreen>
             _buildLeaveForm(),
           ],
         ),
+=======
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Apply for Leave',
+            style: GoogleFonts.outfit(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 20),
+          _buildLeaveForm(),
+        ],
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       ),
     );
   }
 
   Widget _buildLeaveForm() {
+<<<<<<< HEAD
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 20),
+=======
+    return Container(
+      padding: EdgeInsets.all(20),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -2982,11 +3357,16 @@ class _LeaveScreenState extends State<LeaveScreen>
           Text(
             'Leave Details',
             style: GoogleFonts.outfit(
+<<<<<<< HEAD
               fontSize: isMobile ? 16 : 18,
+=======
+              fontSize: 18,
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
+<<<<<<< HEAD
           SizedBox(height: isMobile ? 16 : 20),
           _buildLeaveTypeDropdown(),
           SizedBox(height: isMobile ? 12 : 16),
@@ -3020,6 +3400,25 @@ class _LeaveScreenState extends State<LeaveScreen>
           SizedBox(height: isMobile ? 12 : 16),
           _buildReasonField(),
           SizedBox(height: isMobile ? 16 : 20),
+=======
+          SizedBox(height: 20),
+          _buildFormField('Leave Type', 'Select leave type'),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildFormField('Start Date', 'Select start date', onTap: _selectDate),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildFormField('End Date', 'Select end date', onTap: _selectDate),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          _buildFormField('Reason', 'Enter reason for leave', maxLines: 3),
+          SizedBox(height: 20),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -3027,7 +3426,11 @@ class _LeaveScreenState extends State<LeaveScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.indigo[600],
                 foregroundColor: Colors.white,
+<<<<<<< HEAD
                 padding: EdgeInsets.symmetric(vertical: isMobile ? 14 : 16),
+=======
+                padding: EdgeInsets.symmetric(vertical: 16),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -3035,7 +3438,11 @@ class _LeaveScreenState extends State<LeaveScreen>
               child: Text(
                 'Submit Leave Request',
                 style: GoogleFonts.outfit(
+<<<<<<< HEAD
                   fontSize: isMobile ? 14 : 16,
+=======
+                  fontSize: 16,
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -3046,6 +3453,7 @@ class _LeaveScreenState extends State<LeaveScreen>
     );
   }
 
+<<<<<<< HEAD
   Widget _buildLeaveTypeDropdown() {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
@@ -3110,17 +3518,25 @@ class _LeaveScreenState extends State<LeaveScreen>
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     
+=======
+  Widget _buildFormField(String label, String hint, {VoidCallback? onTap, int maxLines = 1}) {
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: GoogleFonts.outfit(
+<<<<<<< HEAD
             fontSize: isMobile ? 13 : 14,
+=======
+            fontSize: 14,
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
             fontWeight: FontWeight.w500,
             color: Colors.black87,
           ),
         ),
+<<<<<<< HEAD
         SizedBox(height: isMobile ? 6 : 8),
         GestureDetector(
           onTap: onTap,
@@ -3129,10 +3545,18 @@ class _LeaveScreenState extends State<LeaveScreen>
               horizontal: isMobile ? 12 : 16, 
               vertical: isMobile ? 10 : 12,
             ),
+=======
+        SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey[300]!),
               borderRadius: BorderRadius.circular(8),
             ),
+<<<<<<< HEAD
             child: Row(
               children: [
                 Icon(
@@ -3199,6 +3623,14 @@ class _LeaveScreenState extends State<LeaveScreen>
             style: GoogleFonts.outfit(
               fontSize: isMobile ? 13 : 14,
               color: Colors.black87,
+=======
+            child: Text(
+              hint,
+              style: GoogleFonts.outfit(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
             ),
           ),
         ),
@@ -3206,6 +3638,7 @@ class _LeaveScreenState extends State<LeaveScreen>
     );
   }
 
+<<<<<<< HEAD
   void _selectStartDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -3316,6 +3749,19 @@ class _LeaveScreenState extends State<LeaveScreen>
     });
 
     // Show success message
+=======
+  void _selectDate() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days: 365)),
+    );
+  }
+
+  void _submitLeaveRequest() {
+    // Implement leave request submission
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Leave request submitted successfully'),
@@ -3325,6 +3771,7 @@ class _LeaveScreenState extends State<LeaveScreen>
   }
 
   Widget _buildMyRequestsTab() {
+<<<<<<< HEAD
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -3340,11 +3787,20 @@ class _LeaveScreenState extends State<LeaveScreen>
           ),
           child: _buildLeaveRequestCard(request),
         );
+=======
+    return ListView.builder(
+      padding: EdgeInsets.all(20),
+      itemCount: leaveRequests.length,
+      itemBuilder: (context, index) {
+        final request = leaveRequests[index];
+        return _buildLeaveRequestCard(request);
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       },
     );
   }
 
   Widget _buildBalanceTab() {
+<<<<<<< HEAD
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
@@ -3372,17 +3828,43 @@ class _LeaveScreenState extends State<LeaveScreen>
             _buildBalanceItem('Personal Leave', '5 days', '3 days remaining'),
           ],
         ),
+=======
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Leave Balance',
+            style: GoogleFonts.outfit(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 20),
+          _buildBalanceItem('Annual Leave', '20 days', '15 days remaining'),
+          _buildBalanceItem('Sick Leave', '10 days', '8 days remaining'),
+          _buildBalanceItem('Personal Leave', '5 days', '3 days remaining'),
+        ],
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       ),
     );
   }
 
   Widget _buildBalanceItem(String type, String total, String remaining) {
+<<<<<<< HEAD
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     
     return Container(
       margin: EdgeInsets.only(bottom: isMobile ? 12 : 16),
       padding: EdgeInsets.all(isMobile ? 16 : 20),
+=======
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(20),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -3400,23 +3882,39 @@ class _LeaveScreenState extends State<LeaveScreen>
           Text(
             type,
             style: GoogleFonts.outfit(
+<<<<<<< HEAD
               fontSize: isMobile ? 16 : 18,
+=======
+              fontSize: 18,
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
+<<<<<<< HEAD
           SizedBox(height: isMobile ? 6 : 8),
           Text(
             total,
             style: GoogleFonts.outfit(
               fontSize: isMobile ? 13 : 14,
+=======
+          SizedBox(height: 8),
+          Text(
+            total,
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
               color: Colors.grey[600],
             ),
           ),
           Text(
             remaining,
             style: GoogleFonts.outfit(
+<<<<<<< HEAD
               fontSize: isMobile ? 13 : 14,
+=======
+              fontSize: 14,
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
               color: Colors.green[600],
               fontWeight: FontWeight.w500,
             ),
@@ -3427,12 +3925,18 @@ class _LeaveScreenState extends State<LeaveScreen>
   }
 
   Widget _buildLeaveRequestCard(LeaveRequest request) {
+<<<<<<< HEAD
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     
     return Container(
       margin: EdgeInsets.only(bottom: isMobile ? 12 : 16),
       padding: EdgeInsets.all(isMobile ? 16 : 20),
+=======
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(20),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -3450,6 +3954,7 @@ class _LeaveScreenState extends State<LeaveScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+<<<<<<< HEAD
               Expanded(
                 child: Text(
                   request.type,
@@ -3458,11 +3963,20 @@ class _LeaveScreenState extends State<LeaveScreen>
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
                   ),
+=======
+              Text(
+                request.type,
+                style: GoogleFonts.outfit(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
                 ),
               ),
               _getLeaveStatusColor(request.status),
             ],
           ),
+<<<<<<< HEAD
           SizedBox(height: isMobile ? 6 : 8),
           Text(
             '${request.startDate} - ${request.endDate}',
@@ -3476,6 +3990,21 @@ class _LeaveScreenState extends State<LeaveScreen>
             request.reason,
             style: GoogleFonts.outfit(
               fontSize: isMobile ? 13 : 14,
+=======
+          SizedBox(height: 8),
+          Text(
+            '${request.startDate} - ${request.endDate}',
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            request.reason,
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
               color: Colors.grey[700],
             ),
           ),
@@ -3485,9 +4014,12 @@ class _LeaveScreenState extends State<LeaveScreen>
   }
 
   Widget _getLeaveStatusColor(String status) {
+<<<<<<< HEAD
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
     Color color;
     switch (status.toLowerCase()) {
       case 'approved':
@@ -3501,10 +4033,14 @@ class _LeaveScreenState extends State<LeaveScreen>
     }
     
     return Container(
+<<<<<<< HEAD
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 8 : 12, 
         vertical: isMobile ? 4 : 6,
       ),
+=======
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
@@ -3512,7 +4048,11 @@ class _LeaveScreenState extends State<LeaveScreen>
       child: Text(
         status,
         style: GoogleFonts.outfit(
+<<<<<<< HEAD
           fontSize: isMobile ? 10 : 12,
+=======
+          fontSize: 12,
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
           fontWeight: FontWeight.w500,
           color: color,
         ),
@@ -4031,14 +4571,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     radius: 60,
                     backgroundColor: Colors.grey[200],
                     backgroundImage: currentUser.profileImagePath != null
+<<<<<<< HEAD
                         ? (kIsWeb 
                             ? NetworkImage(currentUser.profileImagePath!)
                             : FileImage(File(currentUser.profileImagePath!)) as ImageProvider)
+=======
+                        ? FileImage(File(currentUser.profileImagePath!))
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
                         : null,
                     child: currentUser.profileImagePath == null
                         ? Icon(Icons.person, size: 60, color: Colors.grey[400])
                         : null,
                   ),
+<<<<<<< HEAD
                   // Face registration status indicator
                   if (currentUser.hasRegisteredFace) ...[
                     SizedBox(height: 8),
@@ -4066,6 +4611,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ],
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
                   SizedBox(height: 20),
                   Text(
                     currentUser.name,
@@ -4225,6 +4772,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showFaceManagementDialog(BuildContext context) {
+<<<<<<< HEAD
     final currentUser = GlobalState.currentEmployee;
     if (currentUser == null) return;
 
@@ -4307,11 +4855,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ],
                 ),
+=======
+    final currentUser = EmployeeData.currentEmployee;
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Face Management'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (currentUser?.hasRegisteredFace ?? false) ...[
+              Text('You have registered face data.'),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _registerFace();
+                },
+                child: Text('Update Face Data'),
+              ),
+            ] else ...[
+              Text('You haven\'t registered face data yet.'),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _registerFace();
+                },
+                child: Text('Register Face Data'),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
               ),
             ],
           ],
         ),
         actions: [
+<<<<<<< HEAD
           if (currentUser.hasRegisteredFace) ...[
             TextButton(
               onPressed: () {
@@ -4321,10 +4900,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Text('Delete Face Data', style: TextStyle(color: Colors.red)),
             ),
           ],
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel'),
           ),
+<<<<<<< HEAD
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
@@ -4341,11 +4923,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
             child: Text(currentUser.hasRegisteredFace ? 'Re-register Face' : 'Register Face'),
           ),
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
         ],
       ),
     );
   }
 
+<<<<<<< HEAD
   void _showDeleteFaceConfirmation() {
     showDialog(
       context: context,
@@ -4416,6 +5001,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
   void _registerFace() {
     Navigator.push(
       context,
@@ -4546,6 +5133,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
 
   Future<void> _initializeCamera() async {
     try {
+<<<<<<< HEAD
       if (kIsWeb) {
         // Camera not supported on web
         setState(() {
@@ -4554,6 +5142,8 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
         return;
       }
       
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       final cameras = await availableCameras();
       
       if (cameras.isNotEmpty && mounted) {
@@ -4593,6 +5183,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
       body: _isCameraInitialized
           ? _buildCameraView()
           : Center(
+<<<<<<< HEAD
               child: kIsWeb 
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -4618,6 +5209,9 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
                     ],
                   )
                 : CircularProgressIndicator(color: Colors.white),
+=======
+              child: CircularProgressIndicator(color: Colors.white),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
             ),
     );
   }
@@ -4783,7 +5377,11 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context); // Close dialog
+<<<<<<< HEAD
               Navigator.pop(context, true); // Go back to profile with success result
+=======
+              Navigator.pop(context); // Go back to profile
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
             },
             child: Text('Continue'),
           ),
@@ -4819,6 +5417,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
   Future<void> _initializeCamera() async {
     try {
+<<<<<<< HEAD
       if (kIsWeb) {
         // Camera not supported on web
         setState(() {
@@ -4827,6 +5426,8 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
         return;
       }
       
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       final cameras = await availableCameras();
       if (cameras.isNotEmpty && mounted) {
         _cameraController = CameraController(
@@ -4865,6 +5466,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
       body: _isCameraInitialized
           ? _buildCameraView()
           : Center(
+<<<<<<< HEAD
               child: kIsWeb 
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -4890,6 +5492,9 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
                     ],
                   )
                 : CircularProgressIndicator(color: Colors.white),
+=======
+              child: CircularProgressIndicator(color: Colors.white),
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
             ),
     );
   }
@@ -5017,6 +5622,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
         return;
       }
       
+<<<<<<< HEAD
       // Check for low light conditions
       if (_cameraController!.value.exposureMode == ExposureMode.locked) {
         print('⚠️ Low light detected');
@@ -5033,13 +5639,22 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
       // Take picture with timeout
       print('📸 Taking picture...');
       final XFile capturedImage = await _cameraController!.takePicture().timeout(
+=======
+      // Take picture with timeout
+      print('📸 Taking picture...');
+      await _cameraController!.takePicture().timeout(
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
         Duration(seconds: 10),
         onTimeout: () {
           throw Exception('Camera timeout');
         },
       );
       
+<<<<<<< HEAD
       // Process face verification
+=======
+      // Simulate face verification process with timeout
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       print('🔍 Processing face verification...');
       await Future.delayed(Duration(seconds: 2)).timeout(
         Duration(seconds: 5),
@@ -5048,8 +5663,13 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
         },
       );
       
+<<<<<<< HEAD
       // Simulate face comparison with registered face data
       final isVerified = await _compareFaces(currentUser!.faceData!, capturedImage.path);
+=======
+      // Simulate verification result (80% success rate for testing)
+      final isVerified = DateTime.now().millisecondsSinceEpoch % 5 != 0;
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       
       print('✅ Face verification result: $isVerified');
       
@@ -5076,6 +5696,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
           _isProcessing = false;
         });
       }
+<<<<<<< HEAD
       
       String errorMessage = 'Face verification failed. Please try again.';
       if (e.toString().contains('timeout')) {
@@ -5108,6 +5729,9 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
     } catch (e) {
       print('❌ Face comparison error: $e');
       return false;
+=======
+      _showVerificationError('Error during verification: $e');
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
     }
   }
 
@@ -5887,6 +6511,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     // Handle facial recognition method
     if (method == 'facial') {
       print('👤 Starting facial recognition check-in...');
+<<<<<<< HEAD
       
       // Check if user has registered face data
       final currentUser = GlobalState.currentEmployee;
@@ -5896,6 +6521,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         return;
       }
       
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
       _showFaceVerificationForCheckIn();
       return;
     }
@@ -5911,6 +6538,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     await _performDirectCheckIn(method);
   }
 
+<<<<<<< HEAD
   void _showFaceRegistrationRequired() {
     showDialog(
       context: context,
@@ -5963,6 +6591,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     );
   }
 
+=======
+>>>>>>> a742dec7e33608d0613a6ff532b1ca2f9228ab93
   void _showFaceVerificationForCheckIn() {
     Navigator.push(
       context,
