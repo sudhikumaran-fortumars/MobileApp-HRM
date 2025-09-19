@@ -242,7 +242,11 @@ class FirebaseService {
           .get();
 
       return query.docs.map((doc) {
+<<<<<<< HEAD
         final data = doc.data();
+=======
+        final data = doc.data() as Map<String, dynamic>;
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
         data['id'] = doc.id;
         return data;
       }).toList();
@@ -268,7 +272,11 @@ class FirebaseService {
           .get();
 
       if (query.docs.isNotEmpty) {
+<<<<<<< HEAD
         final data = query.docs.first.data();
+=======
+        final data = query.docs.first.data() as Map<String, dynamic>;
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
         data['id'] = query.docs.first.id;
         return data;
       }
@@ -398,7 +406,11 @@ class FirebaseService {
           .get();
 
       return query.docs.map((doc) {
+<<<<<<< HEAD
         final data = doc.data();
+=======
+        final data = doc.data() as Map<String, dynamic>;
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
         data['id'] = doc.id;
         return data;
       }).toList();

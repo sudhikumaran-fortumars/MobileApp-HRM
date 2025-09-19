@@ -1,13 +1,20 @@
+<<<<<<< HEAD
 ﻿import 'package:flutter/material.dart';
+=======
+import 'package:flutter/material.dart';
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
 import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+<<<<<<< HEAD
 import 'widgets/live_clock_widget.dart';
 import 'widgets/work_timer_widget.dart';
 import 'widgets/checkin_status_widget.dart';
 import 'screens/attendance_analytics_screen.dart';
 import 'services/work_timer_service.dart';
+=======
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
 // import 'services/firebase_service.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:geolocator/geolocator.dart';
@@ -465,6 +472,7 @@ class LeaveRequest {
   });
 }
 
+<<<<<<< HEAD
 // Real-time data management
 class DataManager {
   static Employee? _currentUser;
@@ -497,6 +505,136 @@ class DataManager {
     _currentUser = null;
     _attendanceHistory.clear();
     _leaveRequests.clear();
+=======
+// Mock Data
+class MockData {
+  static List<Employee> get employees {
+    try {
+      return [
+        Employee(
+          empId: 'EMP001',
+          name: 'Sudhi Kumaran',
+          role: 'Frontend & Backend Developer',
+          department: 'Development',
+          shift: 'Morning',
+          status: 'Active',
+          hourlyRate: 200,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        ),
+        Employee(
+          empId: 'EMP002',
+          name: 'Akash Kumar',
+          role: 'Frontend & Backend Developer',
+          department: 'Development',
+          shift: 'Morning',
+          status: 'Active',
+          hourlyRate: 180,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        ),
+        Employee(
+          empId: 'EMP003',
+          name: 'BalaMurugan',
+          role: 'Frontend Developer',
+          department: 'Development',
+          shift: 'Evening',
+          status: 'Active',
+          hourlyRate: 150,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        ),
+      ];
+    } catch (e) {
+      return [
+        Employee(
+          empId: 'EMP001',
+          name: 'Sudhi Kumaran',
+          role: 'Frontend & Backend Developer',
+          department: 'Development',
+          shift: 'Morning',
+          status: 'Active',
+          hourlyRate: 200,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        ),
+      ];
+    }
+  }
+
+  static Map<String, List<AttendanceRecord>> get attendanceData {
+    try {
+      return {
+        'EMP001': [
+          AttendanceRecord(
+            date: '2024-08-22',
+            checkIn: '09:00',
+            checkOut: '18:00',
+            status: 'Present',
+            hours: 8.0,
+            location: 'Office',
+            method: 'facial',
+          ),
+          AttendanceRecord(
+            date: '2024-08-21',
+            checkIn: '09:15',
+            checkOut: '18:30',
+            status: 'Present',
+            hours: 8.25,
+            location: 'Office',
+            method: 'geo',
+          ),
+        ],
+      };
+    } catch (e) {
+      return {};
+    }
+  }
+
+  static List<Task> get tasks {
+    try {
+      return [
+        Task(
+          id: 'TASK001',
+          title: 'Develop Login System',
+          assignedTo: 'EMP001',
+          assignedBy: 'ADMIN',
+          deadline: '2024-08-25',
+          status: 'In Progress',
+          priority: 'High',
+          estimatedHours: 8,
+          description: 'Implement JWT-based authentication system',
+        ),
+        Task(
+          id: 'TASK002',
+          title: 'Design Dashboard UI',
+          assignedTo: 'EMP003',
+          assignedBy: 'EMP001',
+          deadline: '2024-08-26',
+          status: 'Pending',
+          priority: 'Medium',
+          estimatedHours: 6,
+          description: 'Create responsive dashboard interface',
+        ),
+      ];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static List<LeaveRequest> get leaveRequests {
+    try {
+      return [
+        LeaveRequest(
+          id: 'LVE001',
+          empId: 'EMP002',
+          type: 'Sick Leave',
+          startDate: '2024-08-25',
+          endDate: '2024-08-26',
+          reason: 'Medical appointment',
+          status: 'Pending',
+        ),
+      ];
+    } catch (e) {
+      return [];
+    }
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
   }
 }
 
@@ -517,6 +655,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _initializeUser() {
+<<<<<<< HEAD
     // Initialize with a default user for demo purposes
     // In a real app, this would come from authentication/login
     setState(() {
@@ -532,12 +671,53 @@ class _MainScreenState extends State<MainScreen> {
       );
       DataManager.setCurrentUser(currentUser!);
     });
+=======
+    try {
+      if (MockData.employees.isNotEmpty) {
+        setState(() {
+          currentUser = MockData.employees.first;
+        });
+      } else {
+        // Fallback employee if list is empty
+        setState(() {
+          currentUser = Employee(
+            empId: 'EMP001',
+            name: 'Sudhi Kumaran',
+            role: 'Frontend & Backend Developer',
+            department: 'Development',
+            shift: 'Morning',
+            status: 'Active',
+            hourlyRate: 200,
+            location: Location(lat: 11.1085, lng: 77.3411),
+          );
+        });
+      }
+    } catch (e) {
+      // If there's any error, create a fallback employee
+      setState(() {
+        currentUser = Employee(
+          empId: 'EMP001',
+          name: 'Sudhi Kumaran',
+          role: 'Frontend & Backend Developer',
+          department: 'Development',
+          shift: 'Morning',
+          status: 'Active',
+          hourlyRate: 200,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        );
+      });
+    }
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
   }
 
   final List<Widget> _screens = [
     DashboardScreen(),
     AttendanceScreen(),
+<<<<<<< HEAD
     AttendanceAnalyticsScreen(),
+=======
+    TaskScreen(),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
     LeaveScreen(),
     ProfileScreen(),
   ];
@@ -548,6 +728,7 @@ class _MainScreenState extends State<MainScreen> {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+<<<<<<< HEAD
     // Ensure current index is within valid range
     final safeIndex = _currentIndex.clamp(0, _screens.length - 1);
     if (_currentIndex != safeIndex) {
@@ -562,6 +743,10 @@ class _MainScreenState extends State<MainScreen> {
 
     return Scaffold(
       body: _screens[safeIndex],
+=======
+    return Scaffold(
+      body: _screens[_currentIndex],
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -577,9 +762,14 @@ class _MainScreenState extends State<MainScreen> {
           type: BottomNavigationBarType.fixed,
           currentIndex: _currentIndex,
           onTap: (index) {
+<<<<<<< HEAD
             final safeIndex = index.clamp(0, _screens.length - 1);
             setState(() {
               _currentIndex = safeIndex;
+=======
+            setState(() {
+              _currentIndex = index;
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
             });
           },
           selectedItemColor: Color(0xFF1976D2),
@@ -593,10 +783,14 @@ class _MainScreenState extends State<MainScreen> {
               icon: Icon(Icons.access_time),
               label: 'Attendance',
             ),
+<<<<<<< HEAD
             BottomNavigationBarItem(
               icon: Icon(Icons.analytics),
               label: 'Analytics',
             ),
+=======
+            BottomNavigationBarItem(icon: Icon(Icons.task), label: 'Tasks'),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today),
               label: 'Leave',
@@ -610,6 +804,7 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 // Dashboard Screen
+<<<<<<< HEAD
 class DashboardScreen extends StatefulWidget {
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -651,6 +846,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+=======
+class DashboardScreen extends StatelessWidget {
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -763,6 +961,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             SizedBox(height: 20),
 
+<<<<<<< HEAD
             // Live Clock Widget
             LiveClockWidget(),
             SizedBox(height: 20),
@@ -774,15 +973,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             SizedBox(height: 20),
 
+=======
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
             // Quick Stats
             Row(
               children: [
                 Expanded(
                   child: _buildStatCard(
                     'Hours Today',
+<<<<<<< HEAD
                     _workTimerService.isRunning ? _workTimerService.hoursWorked.toStringAsFixed(1) : '0.0',
                     Icons.timer,
                     _workTimerService.isRunning ? Colors.green : Colors.grey,
+=======
+                    '8.0',
+                    Icons.timer,
+                    Colors.green,
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                   ),
                 ),
                 SizedBox(width: 10),
@@ -859,11 +1066,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 SizedBox(width: 10),
+<<<<<<< HEAD
+=======
+                Expanded(
+                  child: _buildActionCard(
+                    'View Tasks',
+                    Icons.task,
+                    Colors.purple,
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => TaskScreen()),
+                    ),
+                  ),
+                ),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
               ],
             ),
             SizedBox(height: 20),
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
             // Recent Activity
             Text(
               'Recent Activity',
@@ -1068,6 +1292,7 @@ class AttendanceScreen extends StatefulWidget {
   State<AttendanceScreen> createState() => _AttendanceScreenState();
 }
 
+<<<<<<< HEAD
 class _AttendanceScreenState extends State<AttendanceScreen> with TickerProviderStateMixin {
   bool isCheckedIn = false;
   String? checkInTime;
@@ -1125,6 +1350,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
     }
   }
   
+=======
+class _AttendanceScreenState extends State<AttendanceScreen> {
+  bool isCheckedIn = false;
+  String? checkInTime;
+  String attendanceMethod = 'facial';
+  bool showCamera = false;
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
 
   @override
   Widget build(BuildContext context) {
@@ -1170,10 +1402,18 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+<<<<<<< HEAD
             // Enhanced Current Status Card
             Container(
               width: double.infinity,
                     padding: EdgeInsets.all(30),
+=======
+            // Current Status Card
+            AnimatedContainer(
+              duration: Duration(milliseconds: 500),
+              width: double.infinity,
+              padding: EdgeInsets.all(25),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: isCheckedIn
@@ -1182,18 +1422,28 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
+<<<<<<< HEAD
                       borderRadius: BorderRadius.circular(30),
+=======
+                borderRadius: BorderRadius.circular(25),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                 boxShadow: [
                   BoxShadow(
                     color: (isCheckedIn ? Color(0xFF00b09b) : Color(0xFFff416c))
                         .withValues(alpha: 0.4),
+<<<<<<< HEAD
                           blurRadius: 30,
                           offset: Offset(0, 15),
+=======
+                    blurRadius: 25,
+                    offset: Offset(0, 12),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                   ),
                 ],
               ),
               child: Column(
                 children: [
+<<<<<<< HEAD
                         // Status Icon with Animation
                         Container(
                           padding: EdgeInsets.all(20),
@@ -1210,15 +1460,28 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                         SizedBox(height: 20),
                         
                         // Status Text
+=======
+                  Icon(
+                    isCheckedIn ? Icons.check_circle : Icons.access_time,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                  SizedBox(height: 10),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                   Text(
                     isCheckedIn ? 'Checked In' : 'Not Checked In',
                     style: GoogleFonts.outfit(
                       color: Colors.white,
+<<<<<<< HEAD
                             fontSize: 28,
+=======
+                      fontSize: 26,
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
                     ),
                   ),
+<<<<<<< HEAD
                         
                         // Time Information
                         if (checkInTime != null) ...[
@@ -1362,10 +1625,116 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
+=======
+                  if (checkInTime != null)
+                    Text(
+                      'Since $checkInTime',
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                    ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      child: ElevatedButton(
+                        onPressed: isCheckedIn
+                            ? _checkOut
+                            : _showAttendanceOptions,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: isCheckedIn
+                              ? Colors.red
+                              : Colors.green,
+                          padding: EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          elevation: 8,
+                          shadowColor: (isCheckedIn ? Colors.red : Colors.green)
+                              .withValues(alpha: 0.3),
+                        ),
+                        child: Text(
+                          isCheckedIn ? 'Check Out' : 'Check In',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+
+            // Today's Summary
+            AnimatedContainer(
+              duration: Duration(milliseconds: 400),
+              width: double.infinity,
+              padding: EdgeInsets.all(25),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.white, Color(0xFFf8f9fa)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(
+                  color: Colors.grey.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 20,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Today\'s Summary',
+                    style: GoogleFonts.outfit(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSummaryItem(
+                          'Check In',
+                          checkInTime ?? '--:--',
+                          Icons.login,
+                          Colors.green,
+                        ),
+                      ),
+                      Expanded(
+                        child: _buildSummaryItem(
+                          'Check Out',
+                          isCheckedIn ? '--:--' : '18:00',
+                          Icons.logout,
+                          Colors.red,
+                        ),
+                      ),
+                      Expanded(
+                        child: _buildSummaryItem(
+                          'Hours',
+                          isCheckedIn ? _calculateHours() : '8.0',
+                          Icons.timer,
+                          Colors.blue,
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                         ),
                       ),
                     ],
                   ),
+<<<<<<< HEAD
                         ],
                 ],
               ),
@@ -1377,6 +1746,28 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
+=======
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+
+            // Attendance History
+            Text(
+              'Attendance History',
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+                letterSpacing: 0.3,
+              ),
+            ),
+            SizedBox(height: 15),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
@@ -1385,6 +1776,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                   ),
                 ],
               ),
+<<<<<<< HEAD
               child: Row(
                 children: [
                   Expanded(
@@ -1395,10 +1787,45 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                   ),
                   Expanded(
                     child: _buildTabButton('Stats', 2, Icons.analytics),
+=======
+              child: Column(
+                children: [
+                  _buildHistoryItem(
+                    'August 21, 2024',
+                    '09:15 - 18:30',
+                    '8.25 hrs',
+                    'Present',
+                    Colors.green,
+                  ),
+                  Divider(height: 1),
+                  _buildHistoryItem(
+                    'August 20, 2024',
+                    '09:00 - 18:00',
+                    '8.0 hrs',
+                    'Present',
+                    Colors.green,
+                  ),
+                  Divider(height: 1),
+                  _buildHistoryItem(
+                    'August 19, 2024',
+                    '--:-- - --:--',
+                    '0.0 hrs',
+                    'Absent',
+                    Colors.red,
+                  ),
+                  Divider(height: 1),
+                  _buildHistoryItem(
+                    'August 18, 2024',
+                    '09:30 - 17:45',
+                    '7.25 hrs',
+                    'Present',
+                    Colors.green,
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                   ),
                 ],
               ),
             ),
+<<<<<<< HEAD
             SizedBox(height: 20),
 
             // Tab Content
@@ -1406,21 +1833,88 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
               duration: Duration(milliseconds: 300),
               child: _buildTabContent(),
             ),
+=======
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
           ],
         ),
       ),
     );
   }
 
+<<<<<<< HEAD
 
 
   Widget _buildCheckInMethodCard(
+=======
+  void _showAttendanceOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Choose Check-in Method',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 20),
+            _buildAttendanceOption(
+              'Facial Recognition',
+              'Use camera for face detection',
+              Icons.face,
+              Colors.blue,
+              () => _checkInWithMethod('facial'),
+            ),
+            _buildAttendanceOption(
+              'QR Code Scan',
+              'Scan office QR code',
+              Icons.qr_code_scanner,
+              Colors.green,
+              () => _checkInWithMethod('qr'),
+            ),
+            _buildAttendanceOption(
+              'Geo Location',
+              'Check location proximity',
+              Icons.location_on,
+              Colors.purple,
+              () => _checkInWithMethod('geo'),
+            ),
+            _buildAttendanceOption(
+              'Manual Entry',
+              'Manual check-in',
+              Icons.edit,
+              Colors.orange,
+              () => _checkInWithMethod('manual'),
+            ),
+            SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAttendanceOption(
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
     String title,
     String subtitle,
     IconData icon,
     Color color,
     VoidCallback onTap,
   ) {
+<<<<<<< HEAD
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -1477,14 +1971,52 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
             ),
           ],
         ),
+=======
+    return Container(
+      margin: EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color),
+        ),
+        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(subtitle),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: () {
+          Navigator.pop(context);
+          onTap();
+        },
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        tileColor: Colors.grey[50],
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
       ),
     );
   }
 
+<<<<<<< HEAD
+=======
+  void _checkInWithMethod(String method) {
+    switch (method) {
+      case 'facial':
+        _showFacialRecognition();
+      case 'qr':
+        _showQRScanner();
+      case 'geo':
+        _checkInWithGeo();
+      case 'manual':
+        _checkInManual();
+    }
+  }
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
 
   void _showFacialRecognition() {
     showDialog(
       context: context,
+<<<<<<< HEAD
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -1527,24 +2059,49 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                 backgroundColor: Colors.grey[300],
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
               ),
+=======
+      builder: (context) => AlertDialog(
+        title: Text('Facial Recognition'),
+        content: SizedBox(
+          height: 200,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.face, size: 80, color: Colors.blue),
+              SizedBox(height: 20),
+              Text('Position your face in the camera'),
+              SizedBox(height: 20),
+              LinearProgressIndicator(),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
             ],
           ),
         ),
         actions: [
           TextButton(
+<<<<<<< HEAD
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel', style: GoogleFonts.outfit(color: Colors.grey[600])),
           ),
           ElevatedButton(
+=======
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
             onPressed: () {
               Navigator.pop(context);
               _performCheckIn('Facial Recognition');
             },
+<<<<<<< HEAD
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
             child: Text('Start Recognition', style: GoogleFonts.outfit(color: Colors.white)),
+=======
+            child: Text('Recognize'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
           ),
         ],
       ),
@@ -1554,6 +2111,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
   void _showQRScanner() {
     showDialog(
       context: context,
+<<<<<<< HEAD
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -1596,30 +2154,56 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                 backgroundColor: Colors.grey[300],
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
               ),
+=======
+      builder: (context) => AlertDialog(
+        title: Text('QR Code Scanner'),
+        content: SizedBox(
+          height: 200,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.qr_code_scanner, size: 80, color: Colors.green),
+              SizedBox(height: 20),
+              Text('Scanning for office QR code...'),
+              SizedBox(height: 20),
+              LinearProgressIndicator(),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
             ],
           ),
         ),
         actions: [
           TextButton(
+<<<<<<< HEAD
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel', style: GoogleFonts.outfit(color: Colors.grey[600])),
           ),
           ElevatedButton(
+=======
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
             onPressed: () {
               Navigator.pop(context);
               _performCheckIn('QR Code');
             },
+<<<<<<< HEAD
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
             child: Text('Scan Complete', style: GoogleFonts.outfit(color: Colors.white)),
+=======
+            child: Text('Scan Complete'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
           ),
         ],
       ),
     );
   }
 
+<<<<<<< HEAD
 
   void _performCheckIn(String method) {
     // Start the work timer first
@@ -1648,11 +2232,50 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
       SnackBar(
         content: Text('Checked in successfully via $method - $status'),
         backgroundColor: status == 'On Time' ? Colors.green : Colors.orange,
+=======
+  void _checkInWithGeo() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Location Verification'),
+        content: Text('Checking your location...'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Simulate location check
+              Future.delayed(Duration(seconds: 1), () {
+                _performCheckIn('Geo Location');
+              });
+            },
+            child: Text('Verify'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _checkInManual() {
+    _performCheckIn('Manual Entry');
+  }
+
+  void _performCheckIn(String method) {
+    setState(() {
+      isCheckedIn = true;
+      checkInTime = TimeOfDay.now().format(context);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Checked in successfully via $method'),
+        backgroundColor: Colors.green,
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
+<<<<<<< HEAD
   String _determineAttendanceStatus(DateTime checkInTime) {
     // Define expected check-in time (9:00 AM)
     DateTime expectedTime = DateTime(checkInTime.year, checkInTime.month, checkInTime.day, 9, 0);
@@ -1761,6 +2384,20 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
           ],
         );
       },
+=======
+  void _checkOut() {
+    setState(() {
+      isCheckedIn = false;
+      checkInTime = null;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Checked out successfully'),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
     );
   }
 
@@ -1770,6 +2407,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
     return '${DateTime.now().difference(DateTime.now().subtract(Duration(hours: 2))).inHours}.0';
   }
 
+<<<<<<< HEAD
   Widget _buildTabButton(String title, int index, IconData icon) {
     final isSelected = selectedTabIndex == index;
     return GestureDetector(
@@ -1843,10 +2481,48 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
           ),
         ],
       ),
+=======
+  Widget _buildSummaryItem(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 24),
+        SizedBox(height: 8),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        Text(title, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+      ],
+    );
+  }
+
+  Widget _buildHistoryItem(
+    String date,
+    String time,
+    String hours,
+    String status,
+    Color statusColor,
+  ) {
+    return Padding(
+      padding: EdgeInsets.all(15),
+      child: Row(
+        children: [
+          Expanded(
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
+<<<<<<< HEAD
             'Today\'s Summary',
             style: GoogleFonts.outfit(
               fontSize: 22,
@@ -1994,10 +2670,22 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+=======
+                  date,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                Text(
+                  time,
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                 ),
               ],
             ),
           ),
+<<<<<<< HEAD
           if (attendanceHistory.isEmpty)
             Padding(
               padding: EdgeInsets.all(20),
@@ -2013,15 +2701,203 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
             )
           else
             ...attendanceHistory.map((record) => _buildEnhancedHistoryItem(record)),
+=======
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                hours,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  status,
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Task Management Screen
+class TaskScreen extends StatefulWidget {
+  @override
+  State<TaskScreen> createState() => _TaskScreenState();
+}
+
+class _TaskScreenState extends State<TaskScreen> with TickerProviderStateMixin {
+  late TabController _tabController;
+  List<Task> tasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+    _initializeTasks();
+  }
+
+  void _initializeTasks() {
+    try {
+      if (MockData.tasks.isNotEmpty) {
+        setState(() {
+          tasks = List.from(MockData.tasks);
+        });
+      }
+    } catch (e) {
+      // If there's any error, use empty list
+      setState(() {
+        tasks = [];
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/fortumars_logo.png',
+              width: 90,
+              height: 90,
+              fit: BoxFit.contain,
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Task Management',
+                  style: GoogleFonts.outfit(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 90,
+            ), // Add invisible space on right to balance the logo
+          ],
+        ),
+        centerTitle: true,
+        backgroundColor: Color(0xFFF5F5F5),
+        foregroundColor: Colors.black87,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Colors.black87,
+          unselectedLabelColor: Colors.black54,
+          indicatorColor: Colors.black87,
+          tabs: [
+            Tab(text: 'All'),
+            Tab(text: 'Pending'),
+            Tab(text: 'In Progress'),
+            Tab(text: 'Completed'),
+          ],
+        ),
+        actions: [
+          IconButton(icon: Icon(Icons.add), onPressed: _showCreateTaskDialog),
+        ],
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildTaskList(tasks),
+          _buildTaskList(tasks.where((t) => t.status == 'Pending').toList()),
+          _buildTaskList(
+            tasks.where((t) => t.status == 'In Progress').toList(),
+          ),
+          _buildTaskList(tasks.where((t) => t.status == 'Completed').toList()),
+        ],
+      ),
+      floatingActionButton: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        child: FloatingActionButton(
+          onPressed: _showCreateTaskDialog,
+          backgroundColor: Colors.transparent,
+          elevation: 12,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Icon(Icons.add, color: Colors.white, size: 28),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTaskList(List<Task> taskList) {
+    if (taskList.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.task, size: 80, color: Colors.grey[400]),
+            SizedBox(height: 20),
+            Text(
+              'No tasks found',
+              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+            ),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
           ],
         ),
       );
     }
 
+<<<<<<< HEAD
   Widget _buildStatsTab() {
     return Container(
       key: ValueKey('stats'),
       padding: EdgeInsets.all(25),
+=======
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: taskList.length,
+      itemBuilder: (context, index) {
+        return _buildTaskCard(taskList[index]);
+      },
+    );
+  }
+
+  Widget _buildTaskCard(Task task) {
+    Color priorityColor = _getPriorityColor(task.priority);
+    Color statusColor = _getStatusColor(task.status);
+
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      margin: EdgeInsets.only(bottom: 20),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [Colors.white, Color(0xFFf8f9fa)],
@@ -2029,6 +2905,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(25),
+<<<<<<< HEAD
+=======
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1), width: 1),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
@@ -2037,6 +2917,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
           ),
         ],
       ),
+<<<<<<< HEAD
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -2072,10 +2953,51 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                 ),
               ),
             ],
+=======
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    task.title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  onSelected: (value) => _handleTaskAction(task, value),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(value: 'edit', child: Text('Edit')),
+                    PopupMenuItem(value: 'delete', child: Text('Delete')),
+                    PopupMenuItem(
+                      value: 'status',
+                      child: Text('Change Status'),
+                    ),
+                  ],
+                  child: Icon(Icons.more_vert, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            if (task.description != null)
+              Text(
+                task.description!,
+                style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
               ),
             SizedBox(height: 12),
             Row(
               children: [
+<<<<<<< HEAD
               Expanded(
                 child: _buildStatCard(
                   'Overtime',
@@ -2207,10 +3129,42 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                   style: GoogleFonts.outfit(
                     fontSize: 14,
                     color: Colors.grey[600],
+=======
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: priorityColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    task.priority,
+                    style: TextStyle(
+                      color: priorityColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    task.status,
+                    style: TextStyle(
+                      color: statusColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                   ),
                 ),
               ],
             ),
+<<<<<<< HEAD
           ),
           
           // Hours and Status
@@ -2233,10 +3187,111 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                     color: statusColor,
                     fontWeight: FontWeight.w600,
                   ),
+=======
+            SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                SizedBox(width: 4),
+                Text(
+                  'Due: ${task.deadline}',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
+                Spacer(),
+                Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
+                SizedBox(width: 4),
+                Text(
+                  '${task.estimatedHours}h',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleTaskAction(Task task, String action) {
+    switch (action) {
+      case 'edit':
+        _showEditTaskDialog(task);
+      case 'delete':
+        _showDeleteTaskDialog(task);
+      case 'status':
+        _showStatusChangeDialog(task);
+    }
+  }
+
+  void _showCreateTaskDialog() {
+    String title = '';
+    String description = '';
+    String priority = 'Medium';
+    String deadline = '';
+    int estimatedHours = 1;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Create New Task'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Task Title',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => title = value,
+              ),
+              SizedBox(height: 16),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                onChanged: (value) => description = value,
+              ),
+              SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                initialValue: priority,
+                decoration: InputDecoration(
+                  labelText: 'Priority',
+                  border: OutlineInputBorder(),
+                ),
+                items: ['High', 'Medium', 'Low'].map((p) {
+                  return DropdownMenuItem(value: p, child: Text(p));
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    priority = value;
+                  }
+                },
+              ),
+              SizedBox(height: 16),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Deadline (YYYY-MM-DD)',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => deadline = value,
+              ),
+              SizedBox(height: 16),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Estimated Hours',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                onChanged: (value) => estimatedHours = int.tryParse(value) ?? 1,
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
               ),
             ],
           ),
         ),
+<<<<<<< HEAD
           
           // Overtime indicator
           if (record['overtime'] > 0) ...[
@@ -2447,13 +3502,246 @@ class _AttendanceScreenState extends State<AttendanceScreen> with TickerProvider
                   fontWeight: FontWeight.w600,
                 ),
               ),
+=======
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (title.isNotEmpty && deadline.isNotEmpty) {
+                Task newTask = Task(
+                  id: 'TASK${(tasks.length + 1).toString().padLeft(3, '0')}',
+                  title: title,
+                  assignedTo: 'EMP001',
+                  assignedBy: 'ADMIN',
+                  deadline: deadline,
+                  status: 'Pending',
+                  priority: priority,
+                  estimatedHours: estimatedHours,
+                  description: description.isEmpty ? null : description,
+                );
+
+                setState(() {
+                  tasks.add(newTask);
+                });
+
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Task created successfully')),
+                );
+              }
+            },
+            child: Text('Create'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditTaskDialog(Task task) {
+    // Similar to create task dialog but with pre-filled values
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Edit task feature coming soon')));
+  }
+
+  void _showDeleteTaskDialog(Task task) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete Task'),
+        content: Text('Are you sure you want to delete "${task.title}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                tasks.removeWhere((t) => t.id == task.id);
+              });
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Task deleted successfully')),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showStatusChangeDialog(Task task) {
+    String newStatus = task.status;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Change Task Status'),
+        content: StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: newStatus == 'Pending'
+                            ? Color(0xFF1976D2)
+                            : Colors.grey,
+                        width: 2,
+                      ),
+                      color: newStatus == 'Pending'
+                          ? Color(0xFF1976D2)
+                          : Colors.transparent,
+                    ),
+                    child: newStatus == 'Pending'
+                        ? Icon(Icons.check, size: 16, color: Colors.white)
+                        : null,
+                  ),
+                  title: Text('Pending'),
+                  onTap: () {
+                    setDialogState(() {
+                      newStatus = 'Pending';
+                    });
+                  },
+                ),
+                ListTile(
+                  leading: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: newStatus == 'In Progress'
+                            ? Color(0xFF1976D2)
+                            : Colors.grey,
+                        width: 2,
+                      ),
+                      color: newStatus == 'In Progress'
+                          ? Color(0xFF1976D2)
+                          : Colors.transparent,
+                    ),
+                    child: newStatus == 'In Progress'
+                        ? Icon(Icons.check, size: 16, color: Colors.white)
+                        : null,
+                  ),
+                  title: Text('In Progress'),
+                  onTap: () {
+                    setDialogState(() {
+                      newStatus = 'In Progress';
+                    });
+                  },
+                ),
+                ListTile(
+                  leading: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: newStatus == 'Completed'
+                            ? Color(0xFF1976D2)
+                            : Colors.grey,
+                        width: 2,
+                      ),
+                      color: newStatus == 'Completed'
+                          ? Color(0xFF1976D2)
+                          : Colors.transparent,
+                    ),
+                    child: newStatus == 'Completed'
+                        ? Icon(Icons.check, size: 16, color: Colors.white)
+                        : null,
+                  ),
+                  title: Text('Completed'),
+                  onTap: () {
+                    setDialogState(() {
+                      newStatus = 'Completed';
+                    });
+                  },
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                 ),
               ],
             );
           },
+<<<<<<< HEAD
     );
   }
 
+=======
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                tasks = tasks.map((t) {
+                  if (t.id == task.id) {
+                    return Task(
+                      id: t.id,
+                      title: t.title,
+                      assignedTo: t.assignedTo,
+                      assignedBy: t.assignedBy,
+                      deadline: t.deadline,
+                      status: newStatus,
+                      priority: t.priority,
+                      estimatedHours: t.estimatedHours,
+                      description: t.description,
+                    );
+                  }
+                  return t;
+                }).toList();
+              });
+              Navigator.pop(context);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Task status updated')));
+            },
+            child: Text('Update'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getPriorityColor(String priority) {
+    switch (priority) {
+      case 'High':
+        return Colors.red;
+      case 'Medium':
+        return Colors.orange;
+      case 'Low':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Completed':
+        return Colors.green;
+      case 'In Progress':
+        return Colors.blue;
+      case 'Pending':
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
+  }
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
 }
 
 // Leave Management Screen
@@ -2466,6 +3754,7 @@ class _LeaveScreenState extends State<LeaveScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   List<LeaveRequest> leaveRequests = [];
+<<<<<<< HEAD
   
   // Form state variables
   String? selectedLeaveType;
@@ -2474,6 +3763,8 @@ class _LeaveScreenState extends State<LeaveScreen>
   TextEditingController reasonController = TextEditingController();
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
+=======
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
 
   @override
   void initState() {
@@ -2482,6 +3773,7 @@ class _LeaveScreenState extends State<LeaveScreen>
     _initializeLeaveRequests();
   }
 
+<<<<<<< HEAD
   @override
   void dispose() {
     _tabController.dispose();
@@ -2495,6 +3787,21 @@ class _LeaveScreenState extends State<LeaveScreen>
     setState(() {
       leaveRequests = List.from(DataManager.leaveRequests);
     });
+=======
+  void _initializeLeaveRequests() {
+    try {
+      if (MockData.leaveRequests.isNotEmpty) {
+        setState(() {
+          leaveRequests = List.from(MockData.leaveRequests);
+        });
+      }
+    } catch (e) {
+      // If there's any error, use empty list
+      setState(() {
+        leaveRequests = [];
+      });
+    }
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
   }
 
   @override
@@ -2607,8 +3914,13 @@ class _LeaveScreenState extends State<LeaveScreen>
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
+<<<<<<< HEAD
                   value: selectedLeaveType,
                   items: [
+=======
+                  items:
+                      [
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                         'Sick Leave',
                         'Casual Leave',
                         'Annual Leave',
@@ -2617,6 +3929,7 @@ class _LeaveScreenState extends State<LeaveScreen>
                       ].map((type) {
                         return DropdownMenuItem(value: type, child: Text(type));
                       }).toList(),
+<<<<<<< HEAD
                   onChanged: (value) {
                     setState(() {
                       selectedLeaveType = value;
@@ -2626,6 +3939,12 @@ class _LeaveScreenState extends State<LeaveScreen>
                 SizedBox(height: 16),
                 TextField(
                   controller: fromDateController,
+=======
+                  onChanged: (value) {},
+                ),
+                SizedBox(height: 16),
+                TextField(
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                   decoration: InputDecoration(
                     labelText: 'From Date',
                     border: OutlineInputBorder(
@@ -2634,11 +3953,18 @@ class _LeaveScreenState extends State<LeaveScreen>
                     suffixIcon: Icon(Icons.calendar_today),
                   ),
                   readOnly: true,
+<<<<<<< HEAD
                   onTap: () => _selectFromDate(context),
                 ),
                 SizedBox(height: 16),
                 TextField(
                   controller: toDateController,
+=======
+                  onTap: () => _selectDate(context),
+                ),
+                SizedBox(height: 16),
+                TextField(
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                   decoration: InputDecoration(
                     labelText: 'To Date',
                     border: OutlineInputBorder(
@@ -2647,11 +3973,18 @@ class _LeaveScreenState extends State<LeaveScreen>
                     suffixIcon: Icon(Icons.calendar_today),
                   ),
                   readOnly: true,
+<<<<<<< HEAD
                   onTap: () => _selectToDate(context),
                 ),
                 SizedBox(height: 16),
                 TextField(
                   controller: reasonController,
+=======
+                  onTap: () => _selectDate(context),
+                ),
+                SizedBox(height: 16),
+                TextField(
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                   decoration: InputDecoration(
                     labelText: 'Reason',
                     border: OutlineInputBorder(
@@ -2912,6 +4245,7 @@ class _LeaveScreenState extends State<LeaveScreen>
     }
   }
 
+<<<<<<< HEAD
   void _selectFromDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -3016,6 +4350,19 @@ class _LeaveScreenState extends State<LeaveScreen>
       toDateController.clear();
     });
     
+=======
+  void _selectDate(BuildContext context) async {
+    await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days: 365)),
+    );
+    // Handle date selection
+  }
+
+  void _submitLeaveRequest() {
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Leave request submitted successfully'),
@@ -3028,6 +4375,7 @@ class _LeaveScreenState extends State<LeaveScreen>
 // Profile Screen
 class ProfileScreen extends StatelessWidget {
   Employee get currentUser {
+<<<<<<< HEAD
     return DataManager.currentUser ?? Employee(
       empId: 'EMP001',
       name: 'Current User',
@@ -3038,6 +4386,37 @@ class ProfileScreen extends StatelessWidget {
       hourlyRate: 200,
       location: Location(lat: 11.1085, lng: 77.3411),
     );
+=======
+    try {
+      if (MockData.employees.isNotEmpty) {
+        return MockData.employees.first;
+      } else {
+        // Fallback employee if list is empty
+        return Employee(
+          empId: 'EMP001',
+          name: 'Sudhi Kumaran',
+          role: 'Frontend & Backend Developer',
+          department: 'Development',
+          shift: 'Morning',
+          status: 'Active',
+          hourlyRate: 200,
+          location: Location(lat: 11.1085, lng: 77.3411),
+        );
+      }
+    } catch (e) {
+      // If there's any error, return a fallback employee
+      return Employee(
+        empId: 'EMP001',
+        name: 'Sudhi Kumaran',
+        role: 'Frontend & Backend Developer',
+        department: 'Development',
+        shift: 'Morning',
+        status: 'Active',
+        hourlyRate: 200,
+        location: Location(lat: 11.1085, lng: 77.3411),
+      );
+    }
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
   }
 
   @override
@@ -3132,7 +4511,11 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     _buildInfoItem(
                       'Hourly Rate',
+<<<<<<< HEAD
                       'â‚¹${currentUser.hourlyRate}',
+=======
+                      '₹${currentUser.hourlyRate}',
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
                       Icons.attach_money,
                     ),
                   ]),

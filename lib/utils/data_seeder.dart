@@ -1,4 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+<<<<<<< HEAD
+=======
+import '../services/firebase_service.dart';
+>>>>>>> 3b9ce857a92dc199a5e3d88b6807ade16bfdb101
 
 class DataSeeder {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
